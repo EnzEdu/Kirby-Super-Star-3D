@@ -5,12 +5,12 @@
 
 class SpringBreeze
 {
-	private: //
+	private: // Variaveis
+		int numRegioes 				= 3;
 
-
-	public: //
-		SpringBreeze();
-		void fase1();
+	public: // Funcoes
+		SpringBreeze 				();
+		void fase1					();
 
 };
 
@@ -102,37 +102,96 @@ void SpringBreeze::fase1()
 
 
 
-	// Chao
-    	glPushMatrix();
 
-        	// Rotacao 3D
-        	glRotatef((GLfloat) rotacaoDDD, 0.0, 1.0, 0.0);
 
-	        glPushMatrix();
-    	        //glTranslatef(0.0, -1.90, 0.0);
-        	    //glTranslatef(0.0, 0.0, 5.0);
-            	//glTranslatef(0.0, -1.6, 5.0);
-	            glColor3f(0.33, 0.33, 0.33);
-    	        glutWireCube(1.5);
-    	        //glutSolidCube(1.5);
-        	glPopMatrix();
+	// Carrega as regioes do mapa conforme posicao do jogador
+	int multiplicador = player.verificaRegioes(numRegioes);
+	if (multiplicador != -1)
+	{
+		//printf("multiplicador = %d\n", multiplicador);
+		// Regiao de tras
 
-	    glPopMatrix();
+			// Chao
+			glPushMatrix();
+				glColor3f(0.33, 0.33, 0.33);
+				glTranslatef(0.0, 0.0, (-1.5)*(multiplicador-1));
+				glutWireCube(1.5);
+			glPopMatrix();
 
-	// Parede esquerda
-	glPushMatrix();
-		glColor3f(1.0, 0.0, 0.0);
-		glTranslatef(-1.5, 1.5, 0.0);
-		glutWireCube(1.5);
-	glPopMatrix();
+			// Parede esquerda
+			glPushMatrix();
+				glColor3f(1.0, 0.0, 0.0);
+				glTranslatef(-1.5, 1.5, (-1.5)*(multiplicador-1));
+			glutWireCube(1.5);
+			glPopMatrix();
 
-	// Parede direita
-	glPushMatrix();
-		glColor3f(0.0, 0.0, 1.0);
-		glTranslatef(1.5, 1.5, 0.0);
-		glutSolidCube(1.5);
-	glPopMatrix();
+			// Parede direita
+			glPushMatrix();
+				glColor3f(0.0, 0.0, 1.0);
+				glTranslatef(1.5, 1.5, (-1.5)*(multiplicador-1));
+				glutWireCube(1.5);
+			glPopMatrix();
 
+
+		// Regiao atual
+
+			// Chao
+			glPushMatrix();
+				glColor3f(0.33, 0.33, 0.33);
+				glTranslatef(0.0, 0.0, (-1.5)*(multiplicador));
+				glutWireCube(1.5);
+			glPopMatrix();
+
+			// Parede esquerda
+			glPushMatrix();
+				glColor3f(1.0, 0.0, 0.0);
+				glTranslatef(-1.5, 1.5, (-1.5)*(multiplicador));
+				glutWireCube(1.5);
+			glPopMatrix();
+
+			// Parede direita
+			glPushMatrix();
+				glColor3f(0.0, 0.0, 1.0);
+				glTranslatef(1.5, 1.5, (-1.5)*(multiplicador));
+				glutWireCube(1.5);
+			glPopMatrix();
+
+
+		// Regiao da frente
+
+			// Chao
+			glPushMatrix();
+				glColor3f(0.33, 0.33, 0.33);
+				glTranslatef(0.0, 0.0, (-1.5)*(multiplicador+1));
+				glutWireCube(1.5);
+			glPopMatrix();
+
+			// Parede esquerda
+			glPushMatrix();
+				glColor3f(1.0, 0.0, 0.0);
+				glTranslatef(-1.5, 1.5, (-1.5)*(multiplicador+1));
+				glutWireCube(1.5);
+			glPopMatrix();
+
+			// Parede direita
+			glPushMatrix();
+				glColor3f(0.0, 0.0, 1.0);
+				glTranslatef(1.5, 1.5, (-1.5)*(multiplicador+1));
+				glutWireCube(1.5);
+			glPopMatrix();
+	}
+
+
+
+
+
+
+
+
+
+
+
+	
 	//stbi_image_free(chao);
 }
 

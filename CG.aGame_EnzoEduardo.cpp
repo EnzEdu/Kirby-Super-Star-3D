@@ -37,12 +37,15 @@ static float teste = 0;
 static double numero = 0.0;
 
 
+// Jogador
+#include "kirby.h"
+Kirby player;
+
+
 // Fases
 #include "springbreeze.h"
 
 
-#include "kirby.h"
-Kirby player;
 
 
 // Teclas do teclado e seus valores ASCII
@@ -70,7 +73,7 @@ int main(int argc, char** argv)
     glutInit(&argc,argv);                                           // Inicia o GLUT com a passagem de parametros C
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);       // Inicia o Display com o sistema RGB, double-buffering e z-buffering
     glutInitWindowSize(800,600);                                    // Tamanho da janela do OpenGL
-    glutInitWindowPosition(100,50);                                // Posicao inicial da janela do OpenGL
+    glutInitWindowPosition(500,50);                                // Posicao inicial da janela do OpenGL
     glutCreateWindow("Computacao Grafica: Braco Robotico");         // Da nome para uma janela OpenGL
 
     init();                                                         // Chama a funcao init()
@@ -155,7 +158,8 @@ void reshape(int w, int h)
 
     // Define a forma do volume de visualizacao para termos uma projecao perspectiva (3D)
     // (angulo, aspecto, ponto_proximo, ponto distante)
-    gluPerspective(60, (float)w/(float)h , 1.0, 11.0);
+    //gluPerspective(60, (float)w/(float)h , 0.5, 5.0);
+    gluPerspective(60, (float)w/(float)h, 0.5, 11.0);
 
     /*
     gluLookAt(0.0, 0.0, 7.0,     // Posicao da camera
@@ -179,7 +183,7 @@ void display(void)
     // Camera que acompanha o jogador
     
     gluLookAt(                      0.0, 1.5, 1.5 + player.retornaPosicaoZ(),
-               player.retornaPosicaoX(), 0.0,       player.retornaPosicaoZ(),
+               player.retornaPosicaoX(), 0.0, player.retornaPosicaoZ(),
                                     0.0, 1.0, 0.0);
     
     /*
