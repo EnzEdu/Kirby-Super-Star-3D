@@ -6,7 +6,7 @@
 class SpringBreeze
 {
 	private: // Variaveis
-		int numRegioes 				= 3;
+		int numRegioes 				= 10;
 
 	public: // Funcoes
 		SpringBreeze 				();
@@ -103,7 +103,7 @@ void SpringBreeze::fase1()
 
 
 
-
+	/*
 	// Carrega as regioes do mapa conforme posicao do jogador
 	int multiplicador = player.verificaRegioes(numRegioes);
 	if (multiplicador != -1)
@@ -180,6 +180,51 @@ void SpringBreeze::fase1()
 				glutWireCube(1.5);
 			glPopMatrix();
 	}
+	*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	//for (int i = 0; i < numRegioes; i++)
+	for (int i = 0; i < 1; i++)
+	{
+			// Chao
+			glPushMatrix();
+				glColor3f(0.33, 0.33, 0.33);
+				glTranslatef(0.0, 0.0, (-1.5)*(i));
+				glutWireCube(1.5);
+			glPopMatrix();
+
+			// Parede esquerda
+			glPushMatrix();
+				glColor3f(1.0, 0.0, 0.0);
+				glTranslatef(-1.5, 1.5, (-1.5)*(i));
+				glutWireCube(1.5);
+			glPopMatrix();
+
+			// Parede direita
+			glPushMatrix();
+				glColor3f(0.0, 0.0, 1.0);
+				glTranslatef(1.5, 1.5, (-1.5)*(i));
+				glutWireCube(1.5);
+			glPopMatrix();
+	}
+
+
+
 
 
 

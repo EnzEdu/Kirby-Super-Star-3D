@@ -1,6 +1,6 @@
 /*
- * Atividade XX - Computacao Grafica
- * Codigo OpenGL/GLUT que 
+ * Atividade Game - Computacao Grafica
+ * Codigo OpenGL/GLUT que refaz o game Kirby Super Star, da plataforma SNES, em 3D
  * Autor: Enzo Eduardo
  * Data: xx/03/2023
 */
@@ -29,17 +29,18 @@
 #include "carregaImagem.h"
 
 // Declaracao de constantes e variaveis
+int width = 800, height = 600;
 static int rotacaoDDD = 0;
-//static int ombro = 0, cotovelo = 0, mao = 0;
-//static int garraIndicador = 0, garraPolegar = 0, garraAnelar = 0;
-static float pil = 0;
-static float teste = 0;
-static double numero = 0.0;
+static char ultimaTecla = '0';
+static int contadorAndando = 0;
 
 
 // Jogador
 #include "kirby.h"
 Kirby player;
+
+#include "hud.h"
+HUD hud;
 
 
 // Fases
@@ -50,6 +51,7 @@ Kirby player;
 
 // Teclas do teclado e seus valores ASCII
 #define ESC 27
+#define SPACE 32
 
 
 
@@ -72,9 +74,9 @@ int main(int argc, char** argv)
 {
     glutInit(&argc,argv);                                           // Inicia o GLUT com a passagem de parametros C
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);       // Inicia o Display com o sistema RGB, double-buffering e z-buffering
-    glutInitWindowSize(800,600);                                    // Tamanho da janela do OpenGL
-    glutInitWindowPosition(500,50);                                // Posicao inicial da janela do OpenGL
-    glutCreateWindow("Computacao Grafica: Braco Robotico");         // Da nome para uma janela OpenGL
+    glutInitWindowSize(width, height);                                    // Tamanho da janela do OpenGL
+    glutInitWindowPosition(500,50);                                 // Posicao inicial da janela do OpenGL
+    glutCreateWindow("Computacao Grafica: Kirby Super Star 3D");    // Da nome para uma janela OpenGL
 
     init();                                                         // Chama a funcao init()
 
@@ -102,6 +104,8 @@ void init(void)
 // Funcao callback para controle das teclas comuns
 void keyboard(unsigned char key, int x, int y) 
 {
+    //printf("key = %c\n", key);
+
     switch (key) {
 
         // lowerCase = sentido horario
@@ -120,22 +124,150 @@ void keyboard(unsigned char key, int x, int y)
         case 'P':   garraPolegar = (garraPolegar + 5) % 120;        break;
         case 'a':    garraAnelar = (garraAnelar - 5) % 120;         break;
         case 'A':    garraAnelar = (garraAnelar + 5) % 120;         break;
-        */
-
-        case 'w':           player.moveKirby( 0.00,-0.02); break;
-        case 'a':           player.moveKirby(-0.02, 0.00); break;
-        case 's':           player.moveKirby( 0.00, 0.02); break;
-        case 'd':           player.moveKirby( 0.02, 0.00); break;
-
 
         case 'y':     rotacaoDDD = (rotacaoDDD - 5) % 360;          break;
         case 'Y':     rotacaoDDD = (rotacaoDDD + 5) % 360;          break;
+        */
 
 
-        case 'l': pil += 0.1; break;
-        case 'L': pil -= 0.1; break;
-        case 'v': teste += 0.1; break;
-        case 'b': teste -= 0.1; break;
+
+
+        // Movimentacao do Kirby
+        case 'w':
+            {
+                if (ultimaTecla == 'w')
+                {
+                    // Conta quanto segundos Kirby passou andando naquela direcao
+                    if (contadorAndando != 8)
+                    {
+                        contadorAndando++;
+                    }
+                }
+                else
+                {
+                    // Reseta o contador ao trocar de tecla
+                    contadorAndando = 0;
+                    ultimaTecla = 'w';
+                }
+
+
+                // Controla a velocidade do Kirby
+                if (contadorAndando != 8)
+                {
+                    // Andando
+                    player.moveKirby(0.00, 0.00, -0.02);
+                }
+                else
+                {
+                    // Correndo
+                    player.moveKirby(0.00, 0.00, -0.04);
+                }
+            }
+        break;
+
+        case 'a':
+            {
+                if (ultimaTecla == 'a')
+                {
+                    // Conta quanto segundos Kirby passou andando naquela direcao
+                    if (contadorAndando != 8)
+                    {
+                        contadorAndando++;
+                    }
+                }
+                else
+                {
+                    // Reseta o contador ao trocar de tecla
+                    contadorAndando = 0;
+                    ultimaTecla = 'a';
+                }
+
+
+                // Controla a velocidade do Kirby
+                if (contadorAndando != 8)
+                {
+                    // Andando
+                    player.moveKirby(-0.02, 0.00, 0.00);
+                }
+                else
+                {
+                    // Correndo
+                    player.moveKirby(-0.04, 0.00, 0.00);
+                }
+            }
+        break;
+
+        case 's':
+            {
+                if (ultimaTecla == 's')
+                {
+                    // Conta quanto segundos Kirby passou andando naquela direcao
+                    if (contadorAndando != 8)
+                    {
+                        contadorAndando++;
+                    }
+                }
+                else
+                {
+                    // Reseta o contador ao trocar de tecla
+                    contadorAndando = 0;
+                    ultimaTecla = 's';
+                }
+
+
+                // Controla a velocidade do Kirby
+                if (contadorAndando != 8)
+                {
+                    // Andando
+                    player.moveKirby(0.00, 0.00, 0.02);
+                }
+                else
+                {
+                    // Correndo
+                    player.moveKirby(0.00, 0.00, 0.04);
+                }
+            }
+        break;
+
+        case 'd':
+            {
+                if (ultimaTecla == 'd')
+                {
+                    // Conta quanto segundos Kirby passou andando naquela direcao
+                    if (contadorAndando != 8)
+                    {
+                        contadorAndando++;
+                    }
+                }
+                else
+                {
+                    // Reseta o contador ao trocar de tecla
+                    contadorAndando = 0;
+                    ultimaTecla = 'd';
+                }
+
+
+                // Controla a velocidade do Kirby
+                if (contadorAndando != 8)
+                {
+                    // Andando
+                    player.moveKirby(0.02, 0.00, 0.00);
+                }
+                else
+                {
+                    // Correndo
+                    player.moveKirby(0.04, 0.00, 0.00);
+                }
+            }
+        break;
+
+        case SPACE:
+            {
+                //printf("apertou espaco!\n");
+                player.moveKirby(0.00, 0.04, 0.00);
+            }
+        break;
+
 
 
         // Sai do programa
@@ -154,20 +286,17 @@ void reshape(int w, int h)
     glLoadIdentity();               // Carrega a matriz identidade
 
     // Define o tamanho da area de desenho da janela
-    glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+
+    // Atualiza as variaveis que salvam o tamanho da janela
+    width = w;
+    height = h;
 
     // Define a forma do volume de visualizacao para termos uma projecao perspectiva (3D)
     // (angulo, aspecto, ponto_proximo, ponto distante)
     //gluPerspective(60, (float)w/(float)h , 0.5, 5.0);
     gluPerspective(60, (float)w/(float)h, 0.5, 11.0);
-
-    /*
-    gluLookAt(0.0, 0.0, 7.0,     // Posicao da camera
-              0.0, -1.0, 0.0,   // Olho da camera (esq/dir, cim/bai, ??/??)
-              0.0, 1.0, 0.0);  // Sentido ou orientacao da camera  ^^^^ |=| vvvv
-    */
-    
-
+    //gluPerspective(60, (float)w/(float)h, 0.5, 20.0);
 }
 
 
@@ -181,58 +310,49 @@ void display(void)
 
 
     // Camera que acompanha o jogador
+//        
+    gluLookAt(                     0.0, 1.5, player.getCoordenadaZ() + 0.9,
+               player.getCoordenadaX(), 0.0, player.getCoordenadaZ() - 0.6,
+                                   0.0, 1.0, 0.0);
+//    
     
-    gluLookAt(                      0.0, 1.5, 1.5 + player.retornaPosicaoZ(),
-               player.retornaPosicaoX(), 0.0, player.retornaPosicaoZ(),
-                                    0.0, 1.0, 0.0);
-    
-    /*
     // Camera teste
+/*
     gluLookAt(0.0, 0.75, 2.0,
               0.0, 0.0, 0.0,
               0.0, 1.0, 0.0);
-    */
-    /*
-    glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_QUADS);
-        glVertex2f(0, 0);
-        glVertex2f(200, 0);
-        glVertex2f(200, 200);
-        glVertex2f(200, 0);
-    glEnd();
-    */
-
-    /*
-    // Braco robotico
-    glPushMatrix();
-
-        // Rotacao 3D
-        glRotatef((GLfloat) rotacaoDDD, 0.0, 1.0, 0.0);
-
-        glPushMatrix();
-            //glTranslatef(0.0, -1.90, 0.0);
-            //glTranslatef(0.0, 0.0, 5.0);
-            //glTranslatef(0.0, -1.6, 5.0);
-            glColor3f(0.33, 0.33, 0.33);
-            glutWireCube(1.5);
-        glPopMatrix();
-
-
-
-    glPopMatrix();
-//    printf("pil %.2f\n", pil);
-
-    
-    // Numero de texture units do meu sistema (eh 32)
-    int texture_units = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &texture_units);
-    //printf("Numero de texture units = %d\n", texture_units);
-    */
+*/
+/*
+    gluLookAt(0.0, 3, 2.0,
+              0.0, 3, 0.0,
+              0.0, 1.0, 0.0);
+*/
 
     SpringBreeze pelsos;
     pelsos.fase1();
 
     player.desenhaKirby();
+
+
+    // Ida ao plano 2D para desenhar o HUD
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, width, 0, height, 0, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    hud.desenhaHUD();
+
+
+
+    // Retorna pro plano 3D
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
+    gluPerspective(60, (float)width/(float)height, 0.5, 11.0);
+
+
 
     // Troca os buffers, mostrando o que acabou de ser desenhado
     glutSwapBuffers();

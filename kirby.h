@@ -6,46 +6,70 @@
 class Kirby
 {
 	private: // Variaveis
-		double movimentoX			= 0.0;
-		double movimentoZ			= 0.0;
+		double raio 				= 0.0625;
+		double coordX 				= 0.00;
+		double coordY 				= 0.82;
+		double coordZ 				= 0.60;
 
 
 	public: // Funcoes
 		void   desenhaKirby			();
-		void   moveKirby			(double valorX, double valorZ);
+		void   moveKirby			(double valorX, double valorY, double valorZ);
+		double getCoordenadaX		();
+		double getCoordenadaY		();
+		double getCoordenadaZ		();
+
 		int    verificaRegioes		(int numBlocosMapa);
-		double retornaPosicaoX		();
-		double retornaPosicaoZ		();
 };
 
-// Desenha o jogador
+
+// Desenha o Kirby
 void Kirby::desenhaKirby()
 {
-	printf("Kirby desenhado!\n");
+	//printf("Kirby desenhado!\n");
 	glPushMatrix();
         glColor3f(1.0, 0.0, 1.0);
-        glTranslatef(movimentoX, 0.85, 0.6+movimentoZ);
-        glutSolidSphere(0.0625, 20, 20);
+        glTranslatef(coordX, coordY, coordZ);
+        glutSolidSphere(raio, 20, 20);
 	glPopMatrix();
-	printf("%.2f 0.85 %.2f\n", movimentoX, 0.6+movimentoZ);
+
+	//printf("POSICAO KIRBY = %.2f %.2f %.2f\n", coordX, coordY, coordZ);
+
+	// Caso esteja inflado, realiza uma queda livre ate a altura original
+	if ((int) (coordY * 100) != 82)
+	{
+		coordY -= 0.001;
+		glutPostRedisplay();
+	}
 }
 
-// Movimentacao do jogador
-void Kirby::moveKirby(double valorX, double valorZ)
+
+
+// Funcao que atualiza as coordenadas do Kirby a cada aperto de botao
+void Kirby::moveKirby(double valorX, double valorY, double valorZ)
 {
-	movimentoX += valorX;
-	movimentoZ += valorZ;
+	coordX += valorX;
+	coordY += valorY;
+	coordZ += valorZ;
 }
 
-double Kirby::retornaPosicaoX()
+
+// Funcoes que retornam as coordenadas do Kirby
+double Kirby::getCoordenadaX()
 {
-	return movimentoX;
+	return coordX;
 }
 
-double Kirby::retornaPosicaoZ()
+double Kirby::getCoordenadaY()
 {
-	return movimentoZ;
+	return coordY;
 }
+
+double Kirby::getCoordenadaZ()
+{
+	return coordZ;
+}
+
 
 // Verifica se o jogador consegue ver outra regiao, alem da regiao em que esta atualmente
 // (usado para carregar regioes por demanda)
@@ -64,7 +88,7 @@ int Kirby::verificaRegioes(int numRegioesMapa)
 	// Verifica se a posicao do jogador no eixo Z esta na lista
 	for (int i = 0; i < numRegioesMapa; i++)
 	{
-		if (movimentoZ+0.6 > limitesRegiaoBaixo[i])
+		if (coordZ > limitesRegiaoBaixo[i])
 		{
 			return i;
 			break;
