@@ -30,7 +30,7 @@
 
 // Declaracao de constantes e variaveis
 int width = 800, height = 600;
-static int rotacaoDDD = 0;
+//static int rotacaoDDD = 0;
 static char ultimaTecla = '0';
 static int contadorAndando = 0;
 
@@ -97,6 +97,32 @@ void init(void)
 {
     glClearColor (1.0, 1.0, 1.0, 1.0);      // Limpa a tela com a cor branca
     glEnable(GL_DEPTH_TEST);                // Habilita o algoritmo Z-Buffer
+
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glEnable(GL_TEXTURE_2D);
+    //carregaTexturas();    
+
+    /*
+     *  Configurando o OpenGL para o uso de Texturas
+     */
+    //Define como a textura sera aplicada ao objeto
+//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+    //Ativa a visualizacao de texturas 2D (Texturizacao 2D)
+    glEnable(GL_TEXTURE_2D);
+    
+    player.carregaModelo();
+    // Ativa o modelo de sombreamento de "Gouraud" (Smooth
+    //glShadeModel(GL_SMOOTH);
+    
+    // Ativa o Back-face Culling
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    
+    // Ativa o z-buffering, de modo a remover as superficies escondidas
+    //glEnable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_LESS);
 }
 
 
@@ -133,6 +159,7 @@ void keyboard(unsigned char key, int x, int y)
 
 
         // Movimentacao do Kirby
+        /*
         case 'w':
             {
                 if (ultimaTecla == 'w')
@@ -267,8 +294,34 @@ void keyboard(unsigned char key, int x, int y)
                 player.moveKirby(0.00, 0.04, 0.00);
             }
         break;
+        */
+        /*
+        case 'w': case 'W':
+            if(jogo.pause == false){
+                if(kirby.esta_pulando == true) keyPlayAnimation(4);
+                else keyPlayAnimation(2);   // Andando
+                if(kirby.direcao == tras){
+                    if(roty == 180.0) posz -= deslocamento;
+                    else if(roty < 180.0) roty += graus;
+                    else if(roty > 180.0) roty -= graus;
+                }else if (direcao==frente){
+                    if (roty >= 0.0) roty += graus;
+                    else roty -= graus;
+                }else if (direcao == direita) roty += graus;
+                else roty -= graus;
+                update_direcao();
+            }
+        break;
 
+        case 'a': case 'A':
+        break;
 
+        case 's': case 'S':
+        break;
+
+        case 'd': case 'D':
+        break;
+        */
 
         // Sai do programa
         case ESC: exit(EXIT_SUCCESS);                               break;
@@ -308,13 +361,14 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // Limpa o Buffer de Cores
     glLoadIdentity();                                       // Carrega a matriz identidade
 
+    glEnable(GL_TEXTURE_2D);
 
     // Camera que acompanha o jogador
-//        
+//
     gluLookAt(                     0.0, 1.5, player.getCoordenadaZ() + 0.9,
                player.getCoordenadaX(), 0.0, player.getCoordenadaZ() - 0.6,
                                    0.0, 1.0, 0.0);
-//    
+//
     
     // Camera teste
 /*
@@ -343,8 +397,7 @@ void display(void)
     glClear(GL_DEPTH_BUFFER_BIT);
 
     hud.desenhaHUD();
-
-
+    carregaImagem();
 
     // Retorna pro plano 3D
     glMatrixMode(GL_PROJECTION);

@@ -1,7 +1,9 @@
 /*  GIMP header image file format (RGB): /home/enzo/Desktop/CG/CG.aGame_EnzoEduardo/img/grass.h  */
 
-static unsigned int width = 16;
-static unsigned int height = 16;
+//static unsigned int width = 16;
+//static unsigned int height = 16;
+static unsigned int grassWidth  = 16;
+static unsigned int grassHeight = 16;
 
 /*  Call this macro repeatedly.  After each use, the pixel data can be extracted  */
 

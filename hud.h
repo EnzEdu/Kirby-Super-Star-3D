@@ -23,7 +23,7 @@ HUD::HUD()
 
 void HUD::desenhaHUD()
 {
-	glColor3f(0.0, 0.0, 0.0);
+	glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_QUADS);
 		glVertex2f(0, 0);
 		glVertex2f(width, 0);

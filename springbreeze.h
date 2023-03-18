@@ -2,6 +2,7 @@
 #define SPRINGBREEZE_H
 
 
+//#include "img/grass.h"
 
 class SpringBreeze
 {
@@ -11,12 +12,52 @@ class SpringBreeze
 	public: // Funcoes
 		SpringBreeze 				();
 		void fase1					();
-
+		void carregaTexturas		();
 };
 
 // Inicializador?
 SpringBreeze::SpringBreeze() {
 	printf("Iniciou?\n");
+}
+
+//
+void SpringBreeze::carregaTexturas()
+{
+    /*
+     *  Configurando o OpenGL para o uso de Texturas
+     */
+	/*
+	int QUANT_TEX = 1;
+	unsigned int id_texturas[QUANT_TEX];
+
+    //Gera nomes identificadores (IDs) para as texturas
+    glGenTextures(QUANT_TEX, id_texturas);
+    
+    //Ativa a textura que sera criada ou usada no momento, por meio do seu ID.
+    glBindTexture(GL_TEXTURE_2D, id_texturas[0]);
+    
+    //Cria a extrutura da textura na mem—ria
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data);
+    
+    //Definicao dos parametros da textura
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    
+    //Define como a textura sera aplicada ao objeto
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, apply_texture);
+
+    //Ativa a visualizacao de texturas 2D (Texturizacao 2D)
+    glEnable(GL_TEXTURE_2D);
+    
+    // Ativa o modelo de sombreamento de "Gouraud" (Smooth
+    glShadeModel( GL_SMOOTH );
+    // Ativa o z-buffering, de modo a remover as superficies escondidas
+    glEnable(GL_DEPTH_TEST);
+    // Define a cor de fundo (branco)
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+    */
 }
 
 // Primeira fase?
@@ -201,11 +242,14 @@ void SpringBreeze::fase1()
 	//for (int i = 0; i < numRegioes; i++)
 	for (int i = 0; i < 1; i++)
 	{
+		int pec = 16;
 			// Chao
 			glPushMatrix();
+				//glScaled(3, 3, 3);
 				glColor3f(0.33, 0.33, 0.33);
 				glTranslatef(0.0, 0.0, (-1.5)*(i));
 				glutWireCube(1.5);
+				//glmReadPPM((char*)"./img/grass2.ppm", &pec, &pec);
 			glPopMatrix();
 
 			// Parede esquerda
@@ -224,7 +268,9 @@ void SpringBreeze::fase1()
 	}
 
 
-
+	// Detecta colisao com o cubo da esquerda?
+	//double diferenca[] = {player.getCoordenadaX() - (-1.5), player.getCoordenadaY() - 1.5, player.getCoordenadaZ() - 0};
+	//printf("%.2f %.2f %.2f\n", diferenca[0], diferenca[1], diferenca[2]);
 
 
 
