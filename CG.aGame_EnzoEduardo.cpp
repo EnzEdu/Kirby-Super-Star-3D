@@ -30,11 +30,11 @@
 
 // Declaracao de constantes e variaveis
 int width = 800, height = 600;
-//static int rotacaoDDD = 0;
 static char ultimaTecla = '0';
 static int contadorAndando = 0;
 
 
+#include "jogo.h"
 // Jogador
 #include "kirby.h"
 Kirby player;
@@ -49,22 +49,17 @@ HUD hud;
 
 
 
-// Teclas do teclado e seus valores ASCII
-#define ESC 27
-#define SPACE 32
-
-
-
 
 
 /*
  * Declaracoes antecipadas (forward) das funcoes (assinaturas)
  */
 void init(void);
-void keyboard (unsigned char key, int x, int y);
 void display(void);
 void reshape (int w, int h);
-
+void keyboard (unsigned char key, int x, int y);
+void timer(int value);
+void computeFPS();
 
 
 
@@ -83,6 +78,7 @@ int main(int argc, char** argv)
     glutDisplayFunc(display);                                       // Funcao callback de desenho
     glutReshapeFunc(reshape);                                       // Funcao callback para redesenhar a tela
     glutKeyboardFunc(keyboard);                                     // Funcao callback para tratar interrupcao do teclado
+    glutTimerFunc(1000/fps_desejado, timer, 0);
     glutMainLoop();                                                 // Executa o loop do OpenGL
 
     return EXIT_SUCCESS;                                            // Retorna 0 para o tipo inteiro da funcao main()
@@ -127,36 +123,109 @@ void init(void)
 
 
 
-// Funcao callback para controle das teclas comuns
+// Funcao callback para o reshape da janela
+void reshape(int w, int h) 
+{
+    glMatrixMode (GL_PROJECTION);   // Muda pro modo de projecao
+    glLoadIdentity();               // Carrega a matriz identidade
+
+    // Define o tamanho da area de desenho da janela
+    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+
+    // Atualiza as variaveis que salvam o tamanho da janela
+    width = w;
+    height = h;
+
+    // Define a forma do volume de visualizacao para termos uma projecao perspectiva (3D)
+    // (angulo, aspecto, ponto_proximo, ponto distante)
+    //gluPerspective(60, (float)w/(float)h , 0.5, 5.0);
+    gluPerspective(60, (float)w/(float)h, 0.5, 11.0);
+    //gluPerspective(60, (float)w/(float)h, 0.5, 20.0);
+}
+
+
+
+// Funcao callback para desenhar na janela
+void display(void) 
+{
+    glMatrixMode(GL_MODELVIEW);                             // Muda pro modo de desenho
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // Limpa o Buffer de Cores
+    glLoadIdentity();                                       // Carrega a matriz identidade
+
+    glEnable(GL_TEXTURE_2D);
+
+    // Camera que acompanha o jogador
+//
+    gluLookAt(                     0.0, 1.5, player.getCoordenadaZ() + 0.9,
+               player.getCoordenadaX(), 0.0, player.getCoordenadaZ() - 0.6,
+                                   0.0, 1.0, 0.0);
+//
+    
+    // Camera teste
+/*
+    gluLookAt(0.0, 0.75, 2.0,
+              0.0, 0.0, 0.0,
+              0.0, 1.0, 0.0);
+*/
+/*
+    gluLookAt(0.0, 3, 2.0,
+              0.0, 3, 0.0,
+              0.0, 1.0, 0.0);
+*/
+
+
+    computeFPS(); // Incrementa o keyframe da animacao a ser desenhado
+
+    SpringBreeze pelsos;
+    pelsos.fase1();
+
+    player.desenhaKirby();
+
+
+    // Ida ao plano 2D para desenhar o HUD
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, width, 0, height, 0, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    hud.desenhaHUD();
+    carregaImagem();
+
+    // Retorna pro plano 3D
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
+    gluPerspective(60, (float)width/(float)height, 0.5, 11.0);
+
+
+
+    // Troca os buffers, mostrando o que acabou de ser desenhado
+    glutSwapBuffers();
+}
+
+
+
+/*
+ * Funcao utilizada para a animacao com temporizador
+ */
+void timer(int value)
+{
+    glutTimerFunc(1000/(fps_desejado), timer, 0);
+    glutPostRedisplay(); // Manda redesenhar a tela em cada frame
+}
+
+
+
+/*
+ * Funcao utilizada para o tratamento do teclado comum
+ */
 void keyboard(unsigned char key, int x, int y) 
 {
     //printf("key = %c\n", key);
 
     switch (key) {
-
-        // lowerCase = sentido horario
-        // upperCase = sentido anti-horario
-        /*
-        case 'o':          ombro = (ombro - 5) % 120;               break;
-        case 'O':          ombro = (ombro + 5) % 120;               break;
-        case 'c':       cotovelo = (cotovelo - 5) % 120;            break;
-        case 'C':       cotovelo = (cotovelo + 5) % 120;            break;
-        case 'm':            mao = (mao - 5) % 120;                 break;
-        case 'M':            mao = (mao + 5) % 120;                 break;
-
-        case 'i': garraIndicador = (garraIndicador - 5) % 120;      break;
-        case 'I': garraIndicador = (garraIndicador + 5) % 120;      break;
-        case 'p':   garraPolegar = (garraPolegar - 5) % 120;        break;
-        case 'P':   garraPolegar = (garraPolegar + 5) % 120;        break;
-        case 'a':    garraAnelar = (garraAnelar - 5) % 120;         break;
-        case 'A':    garraAnelar = (garraAnelar + 5) % 120;         break;
-
-        case 'y':     rotacaoDDD = (rotacaoDDD - 5) % 360;          break;
-        case 'Y':     rotacaoDDD = (rotacaoDDD + 5) % 360;          break;
-        */
-
-
-
 
         // Movimentacao do Kirby
         /*
@@ -323,8 +392,19 @@ void keyboard(unsigned char key, int x, int y)
         break;
         */
 
+        // Pula
+        case SPACE:
+            if (pause == false)
+            {
+                player.keyPlayAnimation(2);     // Trocar. 2 eh o id para ANDANDO
+            }
+        break;
+
+        // Pausa o jogo
+        case 'p': case 'P':         pause = !pause;             break;
+
         // Sai do programa
-        case ESC: exit(EXIT_SUCCESS);                               break;
+        case ESC:                   exit(EXIT_SUCCESS);         break;
     }
 
     glutPostRedisplay();
@@ -332,82 +412,25 @@ void keyboard(unsigned char key, int x, int y)
 
 
 
-// Funcao callback para o reshape da janela
-void reshape(int w, int h) 
-{
-    glMatrixMode (GL_PROJECTION);   // Muda pro modo de projecao
-    glLoadIdentity();               // Carrega a matriz identidade
 
-    // Define o tamanho da area de desenho da janela
-    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-
-    // Atualiza as variaveis que salvam o tamanho da janela
-    width = w;
-    height = h;
-
-    // Define a forma do volume de visualizacao para termos uma projecao perspectiva (3D)
-    // (angulo, aspecto, ponto_proximo, ponto distante)
-    //gluPerspective(60, (float)w/(float)h , 0.5, 5.0);
-    gluPerspective(60, (float)w/(float)h, 0.5, 11.0);
-    //gluPerspective(60, (float)w/(float)h, 0.5, 20.0);
-}
-
-
-
-// Funcao callback para desenhar na janela
-void display(void) 
-{
-    glMatrixMode(GL_MODELVIEW);                             // Muda pro modo de desenho
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // Limpa o Buffer de Cores
-    glLoadIdentity();                                       // Carrega a matriz identidade
-
-    glEnable(GL_TEXTURE_2D);
-
-    // Camera que acompanha o jogador
-//
-    gluLookAt(                     0.0, 1.5, player.getCoordenadaZ() + 0.9,
-               player.getCoordenadaX(), 0.0, player.getCoordenadaZ() - 0.6,
-                                   0.0, 1.0, 0.0);
-//
-    
-    // Camera teste
 /*
-    gluLookAt(0.0, 0.75, 2.0,
-              0.0, 0.0, 0.0,
-              0.0, 1.0, 0.0);
-*/
-/*
-    gluLookAt(0.0, 3, 2.0,
-              0.0, 3, 0.0,
-              0.0, 1.0, 0.0);
-*/
+ * Computa a quantidade de frames por segundo da animacao
+ */
+void computeFPS()
+{    
+    static GLuint frames = 0;       //Conta os frames em 1000 milissegundos, computando o FPS
+    static GLuint clock;            // em milissegudos
+    static GLuint next_clock = 0;   // em milissegudos
 
-    SpringBreeze pelsos;
-    pelsos.fase1();
-
-    player.desenhaKirby();
+    //count_rate++;
+    //frames_playing++;
+    frames++;
+    clock = glutGet(GLUT_ELAPSED_TIME); //Número de milissegundos desde a chamada a glutInit()
 
 
-    // Ida ao plano 2D para desenhar o HUD
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, width, 0, height, 0, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    hud.desenhaHUD();
-    carregaImagem();
-
-    // Retorna pro plano 3D
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
-    gluPerspective(60, (float)width/(float)height, 0.5, 11.0);
-
-
-
-    // Troca os buffers, mostrando o que acabou de ser desenhado
-    glutSwapBuffers();
+    if (clock < next_clock ) return;
+    fps = frames; // guarda o número de frames por segundo
+    // Evita o reinicio da contagem dos frames na primeira iteracao
+    if(next_clock != 0) frames = 0;//Reinicia a contagem dos frames a cada 1000 milissegundos
+    next_clock = clock + 1000; //A cada 1000 milissegundos = 1 segundo
 }
-

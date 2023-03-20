@@ -8,8 +8,8 @@
 class Kirby
 {
 	private:
-		enum animacoes_ids{PAUSADO, IDLE, ANDANDO, CORRENDO, SUGANDO};
-		enum direcao_acam{FRENTE, COSTAS, ESQUERDA, DIREITA};
+		enum animacoes_ids {PAUSADO, IDLE, ANDANDO, CORRENDO, SUGANDO, PULANDO};
+		enum direcao_acam  {FRENTE, COSTAS, ESQUERDA, DIREITA};
 
 		//Numero de faces e vertices do objeto 3D
 		int faces = 0;
@@ -17,6 +17,8 @@ class Kirby
 		
 		int keyframe 				= 0;
 		GLuint mode 				= GLM_SMOOTH;		// Modo de sombreamento
+		int count_rate = -1; //Conta a quantidade de repeticoes do keyframe ate atingir a taxa keyframe_rate
+		int frames_playing = 0; //Conta a quantidade de quadros enquanto reproduz uma mesma animacao ate troca-la
 
 		double raio 				= 0.0625;
 		double posX =  0.00, rotX = 0;
@@ -26,10 +28,14 @@ class Kirby
 
 	public:
 		bool pulando = false;
-		int animacao_id = PAUSADO;
+		int animacao_id = IDLE;
+		int animacao_atual = IDLE;
 		int direcao_id = COSTAS;
 
-		void	carregaModelo();
+		void	carregaModelo		();
+		void atualizaKeyframe		();
+		void playAnimation 			(int id);
+		void keyPlayAnimation		(int id);
 
 		void   desenhaKirby			();
 		void   moveKirby			(double valorX, double valorY, double valorZ);
@@ -40,7 +46,7 @@ class Kirby
 		int    verificaRegioes		(int numBlocosMapa);
 };
 
-GLManimation * animation = NULL;   //Ponteiro usado no armazenamento de uma animacao
+GLManimation *animation = NULL;   //Ponteiro usado no armazenamento de uma animacao
 map <int, GLManimation *> animations; //Mapeamento dos identificadores com as animacoes
 
 
@@ -51,19 +57,18 @@ void Kirby::carregaModelo()
      *  Carregando Modelos 3Ds, Texturas e Animacoes
      */
     printf("Loading 3D Models, Textures and Animations");
-//    animation = glmLoadAnimation("ply/anm/ironman-T-pose.obj", PAUSADO, 1);
-//    animation = glmLoadAnimation("ply/anm/pausado/pausado.obj", PAUSADO, 1);
+
     animation = glmLoadAnimation("ply/pausado.obj", PAUSADO, 1);
     animation->name = "PAUSADO";
     animations[PAUSADO] = animation;
     faces = animation->models[0]->numtriangles;
     vertices = animation->models[0]->numvertices;
     printf(".");
-    /*
+    
     animation = glmLoadAnimation("ply/anm/idle", IDLE, 30);
     animations[IDLE] = animation;
     printf(".");
-	*/
+	
     animation = glmLoadAnimation("ply/anm/andando", ANDANDO, 30);
     animations[ANDANDO] = animation;
     printf(".");
@@ -83,14 +88,6 @@ void Kirby::carregaModelo()
 void Kirby::desenhaKirby()
 {
 	//printf("Kirby desenhado!\n");
-	/*
-	glPushMatrix();
-        glColor3f(1.0, 0.0, 1.0);
-        glTranslatef(posX, posY, posZ);
-        glutSolidSphere(raio, 20, 20);
-	glPopMatrix();
-	*/
-
 	glColor3f(1.0, 0.0, 1.0);
     glPushMatrix();
     	glScaled(0.05, 0.05, 0.05);
@@ -98,11 +95,12 @@ void Kirby::desenhaKirby()
         glRotatef(rotY, 0.0f, 1.0f, 0.0f);
         glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
         glTranslated(posX, posY, posZ);
-        //drawAnimation(animation_id, mode);
         glmDrawAnimation(animations[animacao_id], keyframe, (GLM_SMOOTH | GLM_TEXTURE));
     glPopMatrix();
 
 	//printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
+    
+    atualizaKeyframe();
 
 	// Caso esteja inflado, realiza uma queda livre ate a altura original
 	if ((int) (posY * 100) != 1500)
@@ -110,6 +108,75 @@ void Kirby::desenhaKirby()
 		posY -= 0.001;
 		glutPostRedisplay();
 	}
+}
+
+
+
+/*
+ * Funcao que atualiza o keyframe da animacao, com base no FPS e no framerate atual
+ */
+void Kirby::atualizaKeyframe()
+{
+	// Verifica se a animacao esta em pausa
+    if (pause == false)
+    {
+    	// Incrementa o contador
+    	count_rate++;
+
+    	// Ao atingir a taxa de keyframes
+        if (count_rate == KEYFRAME_RATE)
+        {
+            keyframe++; 	// incrementa o keyframe atual
+            count_rate = 0; // reinicia o contador da taxa de keyframes
+        }
+        
+        // Quantidade de frames da animacao atual
+        int size = animations[animacao_atual]->keyframes;
+        
+
+        // Verifica se foi alterada a animacacao atual e reinicia os contadores para a nova animacao
+        if (animacao_atual != animacao_id)
+        {
+        	playAnimation(animacao_id);
+        }
+
+        // Se uma animacao diferente de idle ou bored nao for mais reiniciada, reproduz a animacao idle
+        else if (animacao_id != IDLE && keyframe >= size && frames_playing >= size)
+        {
+        	playAnimation(IDLE);
+        }
+
+        // Reinicia a mesma animacao
+        else if (keyframe >= size)
+        {
+        	keyframe = 0;
+        }
+    }
+}
+
+
+
+/*
+ * Coloca para reproduzir a animacao identificada
+ */
+void Kirby::playAnimation(int id)
+{
+    keyframe = 0; // atribui o modelo 3D (keyframe) zero da animacao selecionada para ser desenhado
+    frames_playing = 1; // reinicia a contagem de frames da reproducao da mesma animacao
+    count_rate = 0; // Reinicia o contador de repeticoes do mesmo keyframe
+    animacao_id = id; // ativa a animacao com o identificador id
+    animacao_atual = animacao_id; // salva qual e a animacao atual
+}
+
+
+
+/*
+ * Reproduz uma animacao acionada por uma tecla
+ */
+void Kirby::keyPlayAnimation(int id){
+    frames_playing = 0;
+    animacao_id = id;
+    if(id == PULANDO) pulando = true;
 }
 
 

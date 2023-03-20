@@ -17,7 +17,7 @@ class SpringBreeze
 
 // Inicializador?
 SpringBreeze::SpringBreeze() {
-	printf("Iniciou?\n");
+	//printf("Iniciou?\n");
 }
 
 //
