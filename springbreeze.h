@@ -240,7 +240,7 @@ void SpringBreeze::fase1()
 
 
 	//for (int i = 0; i < numRegioes; i++)
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		int pec = 16;
 			// Chao

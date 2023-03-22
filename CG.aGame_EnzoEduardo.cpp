@@ -56,10 +56,12 @@ HUD hud;
  */
 void init(void);
 void display(void);
-void reshape (int w, int h);
-void keyboard (unsigned char key, int x, int y);
+void reshape(int w, int h);
+void keyboard(unsigned char key, int x, int y);
 void timer(int value);
 void computeFPS();
+
+double camX = 0.0, camZ = 1.5;
 
 
 
@@ -92,11 +94,7 @@ int main(int argc, char** argv)
 void init(void)
 {
     glClearColor (1.0, 1.0, 1.0, 1.0);      // Limpa a tela com a cor branca
-    glEnable(GL_DEPTH_TEST);                // Habilita o algoritmo Z-Buffer
-
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //glEnable(GL_TEXTURE_2D);
-    //carregaTexturas();    
+    glEnable(GL_DEPTH_TEST);                // Habilita o algoritmo Z-Buffer  
 
     /*
      *  Configurando o OpenGL para o uso de Texturas
@@ -155,15 +153,21 @@ void display(void)
     glEnable(GL_TEXTURE_2D);
 
     // Camera que acompanha o jogador
-//
+/*
     gluLookAt(                     0.0, 1.5, player.getCoordenadaZ() + 0.9,
                player.getCoordenadaX(), 0.0, player.getCoordenadaZ() - 0.6,
                                    0.0, 1.0, 0.0);
+*/
+
+//
+    gluLookAt(camX, 1.50, camZ,
+              camX, 0.20, camZ - 1.5,
+              0.00, 1.00, 0.00);
 //
     
     // Camera teste
 /*
-    gluLookAt(0.0, 0.75, 2.0,
+    gluLookAt(0.0, 1.75, 2.0,   //0.0, 0.75, 2.0//
               0.0, 0.0, 0.0,
               0.0, 1.0, 0.0);
 */
@@ -174,13 +178,12 @@ void display(void)
 */
 
 
-    computeFPS(); // Incrementa o keyframe da animacao a ser desenhado
+    //computeFPS(); // Incrementa o keyframe da animacao a ser desenhado
 
     SpringBreeze pelsos;
     pelsos.fase1();
 
     player.desenhaKirby();
-
 
     // Ida ao plano 2D para desenhar o HUD
     glMatrixMode(GL_PROJECTION);
@@ -225,187 +228,106 @@ void keyboard(unsigned char key, int x, int y)
 {
     //printf("key = %c\n", key);
 
-    switch (key) {
+    if (pause == false)
+    {
+        switch (key) {
 
-        // Movimentacao do Kirby
-        /*
-        case 'w':
-            {
-                if (ultimaTecla == 'w')
+            // Movimentacao do Kirby
+            case 'w': case 'W':
                 {
-                    // Conta quanto segundos Kirby passou andando naquela direcao
-                    if (contadorAndando != 8)
-                    {
-                        contadorAndando++;
-                    }
+                    // Movimenta o jogador
+                    player.moveKirby( 0.00,  0.00, -0.50);
+                    
+                    // Ajusta a camera
+                    camZ -= 0.025;
+
+                    // Ajusta a rotacao do jogador
+                    player.rotacionaKirby(180.0);
                 }
-                else
+            break;
+
+            case 'a': case 'A':
                 {
-                    // Reseta o contador ao trocar de tecla
-                    contadorAndando = 0;
-                    ultimaTecla = 'w';
+                    // Movimenta o jogador
+                    player.moveKirby(-0.50,  0.00,  0.00);
+            
+                    // Ajusta a camera
+                    camX = 0.02*(player.getCoordenadaX() / 0.50);
+
+                    // Ajusta a rotacao do jogador
+                    player.rotacionaKirby(-90.0);
                 }
+            break;
 
-
-                // Controla a velocidade do Kirby
-                if (contadorAndando != 8)
+            case 's': case 'S':
                 {
-                    // Andando
-                    player.moveKirby(0.00, 0.00, -0.02);
+                    // Movimenta o jogador
+                    player.moveKirby( 0.00,  0.00,  0.50);
+            
+                    // Ajusta a camera
+                    camZ += 0.025;
+
+                    // Ajusta a rotacao do jogador
+                    player.rotacionaKirby( 0.0);
                 }
-                else
+            break;
+
+            case 'd': case 'D':
                 {
-                    // Correndo
-                    player.moveKirby(0.00, 0.00, -0.04);
-                }
-            }
-        break;
+                    // Movimenta o jogador
+                    player.moveKirby( 0.50,  0.00,  0.00);
+            
+                    // Ajusta a camera
+                    camX = 0.02*(player.getCoordenadaX() / 0.50);
 
-        case 'a':
-            {
-                if (ultimaTecla == 'a')
+                    // Ajusta a rotacao do jogador
+                    player.rotacionaKirby(90.0);
+                }
+            break;
+
+            case 'j': case 'J':
                 {
-                    // Conta quanto segundos Kirby passou andando naquela direcao
-                    if (contadorAndando != 8)
-                    {
-                        contadorAndando++;
-                    }
+                    // Evoca a animacao SUGANDO
+                    player.playAnimation(4);
                 }
-                else
+            break;
+
+            case SPACE:
                 {
-                    // Reseta o contador ao trocar de tecla
-                    contadorAndando = 0;
-                    ultimaTecla = 'a';
+                    // Movimenta o jogador
+                    player.moveKirby( 0.00,  1.00,  0.00);
+                    
+                    // Evoca a animacao PULANDO
+                    player.playAnimation(3);
                 }
+            break;
 
-
-                // Controla a velocidade do Kirby
-                if (contadorAndando != 8)
+            case 'p': case 'P':
                 {
-                    // Andando
-                    player.moveKirby(-0.02, 0.00, 0.00);
+                    // Pausa o jogo
+                    pause = !pause;
                 }
-                else
+            break;
+
+            case ESC:
                 {
-                    // Correndo
-                    player.moveKirby(-0.04, 0.00, 0.00);
+                    // Sai do programa
+                    exit(EXIT_SUCCESS);
                 }
-            }
-        break;
-
-        case 's':
-            {
-                if (ultimaTecla == 's')
-                {
-                    // Conta quanto segundos Kirby passou andando naquela direcao
-                    if (contadorAndando != 8)
-                    {
-                        contadorAndando++;
-                    }
-                }
-                else
-                {
-                    // Reseta o contador ao trocar de tecla
-                    contadorAndando = 0;
-                    ultimaTecla = 's';
-                }
-
-
-                // Controla a velocidade do Kirby
-                if (contadorAndando != 8)
-                {
-                    // Andando
-                    player.moveKirby(0.00, 0.00, 0.02);
-                }
-                else
-                {
-                    // Correndo
-                    player.moveKirby(0.00, 0.00, 0.04);
-                }
-            }
-        break;
-
-        case 'd':
-            {
-                if (ultimaTecla == 'd')
-                {
-                    // Conta quanto segundos Kirby passou andando naquela direcao
-                    if (contadorAndando != 8)
-                    {
-                        contadorAndando++;
-                    }
-                }
-                else
-                {
-                    // Reseta o contador ao trocar de tecla
-                    contadorAndando = 0;
-                    ultimaTecla = 'd';
-                }
-
-
-                // Controla a velocidade do Kirby
-                if (contadorAndando != 8)
-                {
-                    // Andando
-                    player.moveKirby(0.02, 0.00, 0.00);
-                }
-                else
-                {
-                    // Correndo
-                    player.moveKirby(0.04, 0.00, 0.00);
-                }
-            }
-        break;
-
-        case SPACE:
-            {
-                //printf("apertou espaco!\n");
-                player.moveKirby(0.00, 0.04, 0.00);
-            }
-        break;
-        */
-        /*
-        case 'w': case 'W':
-            if(jogo.pause == false){
-                if(kirby.esta_pulando == true) keyPlayAnimation(4);
-                else keyPlayAnimation(2);   // Andando
-                if(kirby.direcao == tras){
-                    if(roty == 180.0) posz -= deslocamento;
-                    else if(roty < 180.0) roty += graus;
-                    else if(roty > 180.0) roty -= graus;
-                }else if (direcao==frente){
-                    if (roty >= 0.0) roty += graus;
-                    else roty -= graus;
-                }else if (direcao == direita) roty += graus;
-                else roty -= graus;
-                update_direcao();
-            }
-        break;
-
-        case 'a': case 'A':
-        break;
-
-        case 's': case 'S':
-        break;
-
-        case 'd': case 'D':
-        break;
-        */
-
-        // Pula
-        case SPACE:
-            if (pause == false)
-            {
-                player.keyPlayAnimation(2);     // Trocar. 2 eh o id para ANDANDO
-            }
-        break;
-
-        // Pausa o jogo
-        case 'p': case 'P':         pause = !pause;             break;
-
-        // Sai do programa
-        case ESC:                   exit(EXIT_SUCCESS);         break;
+            break;
+        }
     }
+
+    // Comandos pro jogo pausado
+    else
+    {
+        switch (key)
+        {
+            // Despausa o jogo
+            case 'p': case 'P':         pause = !pause;             break;
+        }
+    }
+
 
     glutPostRedisplay();
 }
@@ -422,8 +344,6 @@ void computeFPS()
     static GLuint clock;            // em milissegudos
     static GLuint next_clock = 0;   // em milissegudos
 
-    //count_rate++;
-    //frames_playing++;
     frames++;
     clock = glutGet(GLUT_ELAPSED_TIME); //Número de milissegundos desde a chamada a glutInit()
 
