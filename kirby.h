@@ -1,8 +1,9 @@
+// Kirby by Miaru3d is licensed under Creative Commons Attribution
+
 #ifndef KIRBY_H
 #define KIRBY_H
 
-
-#include "lib/glm.cpp"
+//#include "lib/glm.cpp"
 #include <map>
 
 class Kirby
@@ -68,7 +69,6 @@ void Kirby::carregaModelo()
     
     animation = glmLoadAnimation("ply/anm/sugando/sugando.obj", SUGANDO, 1);
     animations[SUGANDO] = animation;
-    
     printf(".\n");
 }
 
@@ -76,8 +76,10 @@ void Kirby::carregaModelo()
 // Desenha o Kirby
 void Kirby::desenhaKirby()
 {
-	glColor3f(1.0, 0.0, 1.0);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	
     glPushMatrix();
+	    glColor3f(1.0, 0.0, 1.0);
     	glScaled(0.05, 0.05, 0.05);
     	glTranslated(posX, posY, posZ);
         glRotatef(rotX, 1.0f, 0.0f, 0.0f);
@@ -86,7 +88,7 @@ void Kirby::desenhaKirby()
         glmDrawAnimation(animations[animacao_id], keyframe, GLM_TEXTURE);
     glPopMatrix();
 
-//	printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
+	printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
     
     // Atualizacao de estados do modelo do personagem
     atualizaKeyframe();

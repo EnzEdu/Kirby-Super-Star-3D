@@ -26,6 +26,7 @@
 // Bibliotecas
 #include <stdio.h>
 #include <stdlib.h>
+#include "jogo.h"
 #include "carregaImagem.h"
 
 // Declaracao de constantes e variaveis
@@ -34,7 +35,6 @@ static char ultimaTecla = '0';
 static int contadorAndando = 0;
 
 
-#include "jogo.h"
 // Jogador
 #include "kirby.h"
 Kirby player;
@@ -81,6 +81,10 @@ int main(int argc, char** argv)
     glutReshapeFunc(reshape);                                       // Funcao callback para redesenhar a tela
     glutKeyboardFunc(keyboard);                                     // Funcao callback para tratar interrupcao do teclado
     glutTimerFunc(1000/fps_desejado, timer, 0);
+
+
+    carregaImagem();
+
     glutMainLoop();                                                 // Executa o loop do OpenGL
 
     return EXIT_SUCCESS;                                            // Retorna 0 para o tipo inteiro da funcao main()
@@ -93,20 +97,30 @@ int main(int argc, char** argv)
 // Funcao com alguns comandos para a inicializacao do OpenGL
 void init(void)
 {
-    glClearColor (1.0, 1.0, 1.0, 1.0);      // Limpa a tela com a cor branca
-    glEnable(GL_DEPTH_TEST);                // Habilita o algoritmo Z-Buffer  
-
-    /*
-     *  Configurando o OpenGL para o uso de Texturas
-     */
     //Define como a textura sera aplicada ao objeto
 //    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
+
+
     //Ativa a visualizacao de texturas 2D (Texturizacao 2D)
     glEnable(GL_TEXTURE_2D);
+
+    // Ativa o Back-face Culling
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
+//    glShadeModel( GL_SMOOTH );
+
+    glEnable(GL_DEPTH_TEST);                // Habilita o algoritmo Z-Buffer
+
+
+    glClearColor (1.0, 1.0, 1.0, 1.0);      // Limpa a tela com a cor branca 
+
+
     
     player.carregaModelo();
+
+
     // Ativa o modelo de sombreamento de "Gouraud" (Smooth
     //glShadeModel(GL_SMOOTH);
     
@@ -139,6 +153,8 @@ void reshape(int w, int h)
     //gluPerspective(60, (float)w/(float)h , 0.5, 5.0);
     gluPerspective(60, (float)w/(float)h, 0.5, 11.0);
     //gluPerspective(60, (float)w/(float)h, 0.5, 20.0);
+
+//    carregaImagem();
 }
 
 
@@ -150,7 +166,8 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // Limpa o Buffer de Cores
     glLoadIdentity();                                       // Carrega a matriz identidade
 
-    glEnable(GL_TEXTURE_2D);
+//    glEnable(GL_TEXTURE_2D);
+
 
     // Camera que acompanha o jogador
 /*
@@ -164,6 +181,10 @@ void display(void)
               camX, 0.20, camZ - 1.5,
               0.00, 1.00, 0.00);
 //
+
+    SpringBreeze pelsos;
+    //pelsos.fase1();
+    pelsos.felcos();
     
     // Camera teste
 /*
@@ -180,10 +201,10 @@ void display(void)
 
     //computeFPS(); // Incrementa o keyframe da animacao a ser desenhado
 
-    SpringBreeze pelsos;
-    pelsos.fase1();
 
     player.desenhaKirby();
+
+
 
     // Ida ao plano 2D para desenhar o HUD
     glMatrixMode(GL_PROJECTION);
@@ -194,15 +215,14 @@ void display(void)
     glClear(GL_DEPTH_BUFFER_BIT);
 
     hud.desenhaHUD();
-    carregaImagem();
+//    carregaImagem();
 
     // Retorna pro plano 3D
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+//    desenhaImagem();
     glViewport(0, 0, (GLsizei) width, (GLsizei) height);
     gluPerspective(60, (float)width/(float)height, 0.5, 11.0);
-
-
 
     // Troca os buffers, mostrando o que acabou de ser desenhado
     glutSwapBuffers();
