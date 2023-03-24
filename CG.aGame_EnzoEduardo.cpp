@@ -44,8 +44,8 @@ HUD hud;
 
 
 // Fases
-#include "springbreeze.h"
-
+#include "seletor.h"
+SeletorDeFases seletor;
 
 
 
@@ -153,8 +153,6 @@ void reshape(int w, int h)
     //gluPerspective(60, (float)w/(float)h , 0.5, 5.0);
     gluPerspective(60, (float)w/(float)h, 0.5, 11.0);
     //gluPerspective(60, (float)w/(float)h, 0.5, 20.0);
-
-//    carregaImagem();
 }
 
 
@@ -166,7 +164,6 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // Limpa o Buffer de Cores
     glLoadIdentity();                                       // Carrega a matriz identidade
 
-//    glEnable(GL_TEXTURE_2D);
 
 
     // Camera que acompanha o jogador
@@ -182,9 +179,6 @@ void display(void)
               0.00, 1.00, 0.00);
 //
 
-    SpringBreeze pelsos;
-    //pelsos.fase1();
-    pelsos.felcos();
     
     // Camera teste
 /*
@@ -199,12 +193,9 @@ void display(void)
 */
 
 
-    //computeFPS(); // Incrementa o keyframe da animacao a ser desenhado
 
-
-    player.desenhaKirby();
-
-
+    seletor.desenhaFase();    
+    player.desenhar();
 
     // Ida ao plano 2D para desenhar o HUD
     glMatrixMode(GL_PROJECTION);
@@ -215,12 +206,10 @@ void display(void)
     glClear(GL_DEPTH_BUFFER_BIT);
 
     hud.desenhaHUD();
-//    carregaImagem();
 
     // Retorna pro plano 3D
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-//    desenhaImagem();
     glViewport(0, 0, (GLsizei) width, (GLsizei) height);
     gluPerspective(60, (float)width/(float)height, 0.5, 11.0);
 

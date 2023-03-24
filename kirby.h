@@ -19,7 +19,7 @@ class Kirby
 		double raio = 0.0625;
 		double posX =  0.00, rotX = 0;
 		double posY = 15.00, rotY = 180;
-		double posZ =  0.60, rotZ = 0;
+		double posZ =  10.00, rotZ = 0;
 
 
 	public:
@@ -33,7 +33,7 @@ class Kirby
 		void    playAnimation 		(int id);
 		void keyPlayAnimation		(int id);
 
-		void   desenhaKirby			();
+		void   desenhar				();
 		void   moveKirby			(double valorX, double valorY, double valorZ);
 		void   rotacionaKirby		(double valorY);
 		double getCoordenadaX		();
@@ -55,26 +55,26 @@ void Kirby::carregaModelo()
      *  Carregando Modelo, Textura e Animacoes
      */
     printf("Carregando");
-    animation = glmLoadAnimation("ply/anm/idle", IDLE, 30);
+    animation = glmLoadAnimation("player/anm/idle", IDLE, 30);
     animations[IDLE] = animation;
     printf(".");
 	
-    animation = glmLoadAnimation("ply/anm/andando", ANDANDO, 30);
+    animation = glmLoadAnimation("player/anm/andando", ANDANDO, 30);
     animations[ANDANDO] = animation;
     printf(".");
     
-    animation = glmLoadAnimation("ply/anm/pulando/pulando.obj", PULANDO, 1);
+    animation = glmLoadAnimation("player/anm/pulando/pulando.obj", PULANDO, 1);
     animations[PULANDO] = animation;
     printf(".");
     
-    animation = glmLoadAnimation("ply/anm/sugando/sugando.obj", SUGANDO, 1);
+    animation = glmLoadAnimation("player/anm/sugando/sugando.obj", SUGANDO, 1);
     animations[SUGANDO] = animation;
     printf(".\n");
 }
 
 
 // Desenha o Kirby
-void Kirby::desenhaKirby()
+void Kirby::desenhar()
 {
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	
@@ -88,7 +88,14 @@ void Kirby::desenhaKirby()
         glmDrawAnimation(animations[animacao_id], keyframe, GLM_TEXTURE);
     glPopMatrix();
 
-	printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
+    glPushMatrix();
+    	glColor3f(1.0, 0.0, 1.0);
+    	glScaled(0.05, 0.05, 0.05);
+    	glTranslated(posX, posY+1.7, posZ);
+        glutWireSphere(1.4, 20, 20);				// Hitbox?
+    glPopMatrix();
+
+//	printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
     
     // Atualizacao de estados do modelo do personagem
     atualizaKeyframe();

@@ -6,14 +6,13 @@
 
 class SpringBreeze
 {
-	private: // Variaveis
-		int numRegioes 				= 10;
-
-	public: // Funcoes
+	public:
 		SpringBreeze 				();
-		void fase1					();
 		void carregaTexturas		();
-		void felcos					();
+		void desenhar				();
+
+	private:
+		int numRegioes 				= 1;
 };
 
 // Inicializador?
@@ -26,12 +25,8 @@ void SpringBreeze::carregaTexturas()
 {
 }
 
-// Primeira fase?
-void SpringBreeze::fase1()
-{
-}
 
-void SpringBreeze::felcos()
+void SpringBreeze::desenhar()
 {
 	/*
 	// Versao sem textura
@@ -92,7 +87,7 @@ void SpringBreeze::felcos()
 
 		// Faces horizontais = sentido horario comecando do vert inf-esq
 		{0, 3, 2, 1},	// Face 4
-		{4, 7, 6, 3}	// Face 5
+		{4, 7, 6, 5}	// Face 5
 	};
 
 	// Define as coordenadas de textura do cubo
@@ -105,60 +100,82 @@ void SpringBreeze::felcos()
 		{{0.0, 0.0}, {1.0, 0.0}, {1.0, 1.0}, {0.0, 1.0}}
 	};
 
+	GLfloat coordsTexturaChaoUm[numFaces][4][2] = {
+		{{0.0, 0.0}, {0.333, 0.0}, {0.333, 0.333}, {0.0, 0.333}},
+		{{0.0, 0.0}, {0.333, 0.0}, {0.333, 0.333}, {0.0, 0.333}},
+		{{0.0, 0.0}, {0.333, 0.0}, {0.333, 0.333}, {0.0, 0.333}},
+		{{0.0, 0.0}, {0.333, 0.0}, {0.333, 0.333}, {0.0, 0.333}},
+		{{0.0, 0.0}, {0.333, 0.0}, {0.333, 0.333}, {0.0, 0.333}},
+		{{0.0, 0.0}, {0.333, 0.0}, {0.333, 0.333}, {0.0, 0.333}}
+	};
+
+	GLfloat coordsTexturaPaisagemUm[numFaces][4][2] = {
+		{{0.0, 1.0}, {0.303, 1.0}, {0.303, 0.503}, {0.0, 0.503}},
+		{{0.0, 1.0}, {0.303, 1.0}, {0.303, 0.503}, {0.0, 0.503}},
+		{{0.0, 1.0}, {0.303, 1.0}, {0.303, 0.503}, {0.0, 0.503}},
+		{{0.0, 1.0}, {0.303, 1.0}, {0.303, 0.503}, {0.0, 0.503}},
+		{{0.0, 1.0}, {0.303, 1.0}, {0.303, 0.503}, {0.0, 0.503}},
+		{{0.0, 1.0}, {0.303, 1.0}, {0.303, 0.503}, {0.0, 0.503}}
+	};
 
 
-	for (int i = -1; i < 2; i++)
+
+	for (int i = 0; i < numRegioes; i++)
 	{
 		// Chao
 		glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);
 		glPushMatrix();
 			glColor3f(0.0, 0.0, 0.0);
+			//glRotatef(90, 0.0, 0.0, 1.0);
 			glTranslatef(0.0, 0.0, -(1.5)*i);
+			glRotatef(90, 0.0, 0.0, 1.0);
 			glBegin(GL_QUADS);
 				for (int i = 0; i < numFaces; i++)
 				{
 					for (int j = 0; j < 4; j++)
 					{
 						// Define o vertice j da face i
-						glTexCoord2fv(coordsTextura[i][j]);
+						glTexCoord2fv(coordsTexturaChaoUm[i][j]);
 						glVertex3fv(coordsVertices[coordsFaces[i][j]]);
 					}
 				}
 			glEnd();
 		glPopMatrix();
 
-
+		
 		// Parede esquerda
 		glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);
 		glPushMatrix();
 			glColor3f(0.0, 0.0, 0.0);
 			glTranslatef(-1.5, 1.5, -(1.5)*i);
+			glRotatef(270.0, 1.0, 0.0, 0.0);
 			glBegin(GL_QUADS);
 				for (int i = 0; i < numFaces; i++)
 				{
 					for (int j = 0; j < 4; j++)
 					{
 						// Define o vertice j da face i
-						glTexCoord2fv(coordsTextura[i][j]);
+						glTexCoord2fv(coordsTexturaPaisagemUm[i][j]);
 						glVertex3fv(coordsVertices[coordsFaces[i][j]]);
 					}
 				}
 			glEnd();
 		glPopMatrix();
 
-
+		
 		// Parede direita
 		glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);
 		glPushMatrix();
 			glColor3f(0.0, 0.0, 0.0);
 			glTranslatef(1.5, 1.5, -(1.5)*i);
+			glRotatef(90, 0.0, 0.0, 1.0);
 			glBegin(GL_QUADS);
 				for (int i = 0; i < numFaces; i++)
 				{
 					for (int j = 0; j < 4; j++)
 					{
 						// Define o vertice j da face i
-						glTexCoord2fv(coordsTextura[i][j]);
+						glTexCoord2fv(coordsTexturaPaisagemUm[i][j]);
 						glVertex3fv(coordsVertices[coordsFaces[i][j]]);
 					}
 				}
