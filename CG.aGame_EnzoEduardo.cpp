@@ -42,13 +42,12 @@ Kirby player;
 #include "hud.h"
 HUD hud;
 
-
 // Fases
 #include "seletor.h"
-SeletorDeFases seletor;
+SeletorDeMundos seletor;
 
 
-
+double camX = 0.0, camZ = 1.5;
 
 
 /*
@@ -61,7 +60,7 @@ void keyboard(unsigned char key, int x, int y);
 void timer(int value);
 void computeFPS();
 
-double camX = 0.0, camZ = 1.5;
+//double camX = 0.0, camZ = 1.5;
 
 
 
@@ -99,7 +98,7 @@ void init(void)
 {
     //Define como a textura sera aplicada ao objeto
 //    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
 
 
@@ -107,8 +106,9 @@ void init(void)
     glEnable(GL_TEXTURE_2D);
 
     // Ativa o Back-face Culling
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
 //    glShadeModel( GL_SMOOTH );
 
     glEnable(GL_DEPTH_TEST);                // Habilita o algoritmo Z-Buffer
@@ -175,7 +175,7 @@ void display(void)
 
 //
     gluLookAt(camX, 1.50, camZ,
-              camX, 0.20, camZ - 1.5,
+              camX, 0.00, camZ - 1.5,
               0.00, 1.00, 0.00);
 //
 
@@ -192,10 +192,12 @@ void display(void)
               0.0, 1.0, 0.0);
 */
 
+    // Desenha o mundo a ser jogado
+    seletor.desenhaMundo();
 
-
-    seletor.desenhaFase();    
+    // Desenha o jogador
     player.desenhar();
+
 
     // Ida ao plano 2D para desenhar o HUD
     glMatrixMode(GL_PROJECTION);

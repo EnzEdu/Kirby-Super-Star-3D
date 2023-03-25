@@ -2,44 +2,44 @@
 #define SELETOR_H
 
 
-#include "fases/springbreeze.h"
+#include "mundos/springbreeze.h"
 
-class SeletorDeFases
+class SeletorDeMundos
 {
 	public:
-				SeletorDeFases();
-		void	desenhaFase();
+				SeletorDeMundos();
+		void	desenhaMundo();
 
 	private:
-		int faseAtual;
+		int mundoAtual;
 
 		// Fases
-		SpringBreeze fase1;
+		SpringBreeze mundo1;
 };
 
 /*
  *	Construtor da classe
  */
-SeletorDeFases::SeletorDeFases()
+SeletorDeMundos::SeletorDeMundos()
 {
-	// Inicializa o id da fase atual
-	faseAtual = 1;		// Eh pra ser 0
+	// Inicializa o id da mundo atual
+	mundoAtual = 1;		// Eh pra ser 0
 }
 
 /*
- *	Funcao que desenha a fase do jogo, de acordo com o valor de
- *	faseAtual
+ *	Funcao que desenha o mundo do jogo, de acordo com o valor de
+ *	mundoAtual
  */
-void SeletorDeFases::desenhaFase()
+void SeletorDeMundos::desenhaMundo()
 {
-	switch (faseAtual)
+	switch (mundoAtual)
 	{
 		case 0:
 			//menu.desenhar();
 		break;
 
 		case 1:
-			fase1.desenhar();
+			mundo1.desenhar();
 		break;
 	}
 }
