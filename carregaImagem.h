@@ -42,7 +42,7 @@ void carregaImagem()
 
 //                if(grass){
                     // Gera nomes identificadores (IDs) para as texturas
-                    glGenTextures(10, objetosMapa);
+                    glGenTextures(1, objetosMapa);
 
                     // Ativa a textura que sera criada ou usada no momento, por meio do seu ID
                     glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);
@@ -54,27 +54,6 @@ void carregaImagem()
 
                     // Cria a extrutura da textura na memoria
                     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tilesWidth, tilesHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, textura_data);
-                    
-                    // Definicao dos parametros da textura
-                    //glGenerateMipmap(GL_TEXTURE_2D);
-
-                    /*
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-                    */
-
-
-
-
-                    //glDisable(GL_COLOR_MATERIAL);
-                    //glBindTexture(GL_TEXTURE_2D, );
-//                    printf("AAAAAAAAAAAA\n");
-//                }
-                    //glClearColor(1.0, 1.0, 1.0, 1.0);
-    
 }
 
 

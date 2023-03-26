@@ -20,7 +20,11 @@ int fps = 0; //contador de frames por segundo
 
 
 bool pause = false;
-unsigned int objetosMapa[10];
+unsigned int objetosMapa[10] = 
+{
+	65535, 65535, 65535, 65535, 65535, 
+	65535, 65535, 65535, 65535, 65535
+};
 
 
 

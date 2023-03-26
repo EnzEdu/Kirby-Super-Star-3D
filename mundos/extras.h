@@ -5,37 +5,53 @@
  * Data: ??/03/2023
 */
 
-#ifndef extras_h
-#define extras_h
-
-#include <forward_list>
+#ifndef EXTRAS_H
+#define EXTRAS_H
 
 
 
-/* Estrutura de um "objeto" dentro de um mundo
+
+/* Estrutura de classe de um "objeto" dentro de um mundo
  * Pode caracterizar um coletavel, um inimigo...
  */
-struct objeto {
-	float coordX, coordY, coordZ;
-	float texX1, texX2, texY1, texY2;
+class Objeto
+{
+	public:
+		bool desenhar;
+		bool usarTextura;
+		float coordX, coordY, coordZ;
+		float corR, corG, corB;
+		float texX1, texX2, texY1, texY2;
+
+		void desativarDesenho()
+		{
+			desenhar = false;
+		}
 };
 
 
-/* Estrutura de uma "regiao" dentro de um mundo
+/* Estrutura de classe de uma "regiao" dentro de um mundo
  * Uma regiao caracteriza um chao e duas paredes (ou 3 cubos ao todo)
  * Uma regiao tambem pode conter objetos ou nao
  * Um "mundo" eh formado por um conjunto de regioes
  */
-struct regiao {
-	// Chao
-	float chCoordX, chCoordY, chCoordZ;
-	float chTexX1, chTexX2, chTexY1, chTexY2;
+class Regiao
+{
+	public:
+		// Chao
+		float chCoordX, chCoordY, chCoordZ;
+		float chTexX1, chTexX2, chTexY1, chTexY2;
 
-	// Paredes
-	float paTexX1, paTexX2, paTexY1, paTexY2;
+		// Paredes
+		float paTexX1, paTexX2, paTexY1, paTexY2;
 
-	// Lista de objetos
-	forward_list<objeto> objetos;
+		// Lista de objetos
+		forward_list<Objeto> objetos;
+
+		forward_list<Objeto> getObjetos()
+		{
+			return objetos;
+		}
 };
 
 
@@ -70,16 +86,14 @@ class Mundo
 			{4, 5, 6, 7}	// Face 5 (superior)
 		};
 
-		forward_list<regiao> regioes;
+		forward_list<Regiao> regioes;
 
 		void pushRegiao(float chCoordX, float chCoordY, float chCoordZ,
 			            float chTexX1, float chTexX2, float chTexY1, float chTexY2,
 			            float paTexX1, float paTexX2, float paTexY1, float paTexY2)
 		{
-			regiao r;
-
+			Regiao r;
 			r.chCoordX = chCoordX; r.chCoordY = chCoordY; r.chCoordZ = chCoordZ;
-
 			r.chTexX1 = chTexX1; r.chTexX2 = chTexX2; r.chTexY1 = chTexY1; r.chTexY2 = chTexY2;
 			r.paTexX1 = paTexX1; r.paTexX2 = paTexX2; r.paTexY1 = paTexY1; r.paTexY2 = paTexY2;
 
@@ -90,15 +104,57 @@ class Mundo
 		 * Funcao que cria um objeto e coloca na lista de objetos
 		 * da regiao que esta no topo da lista de regioes
 		 */
-		void pushObjeto(float coordX, float coordY, float coordZ,
+		void pushObjeto(bool desenhar, bool usarTextura,
+						float coordX, float coordY, float coordZ,
+						float corR, float corG, float corB,
 						float texX1, float texX2, float texY1, float texY2)
 		{
-			objeto o;
+			Objeto o;
+			o.desenhar = desenhar; o.usarTextura = usarTextura;
 			o.coordX = coordX; o.coordY = coordY; o.coordZ = coordZ;
-			o.texX1 = texX1; o.texX2 = texX2;
-			o.texY1 = texY1; o.texY2 = texY2;
+			o.corR = corR; o.corG = corG; o.corB = corB;
+			o.texX1 = texX1; o.texX2 = texX2; o.texY1 = texY1; o.texY2 = texY2;
 
 			regioes.front().objetos.push_front(o);
+		}
+
+		void setEstadoObjeto(forward_list<int> dados)
+		{			
+			// Itera sobre os dados retornados (regiao e objeto)
+			for (forward_list<int>::iterator it = dados.begin(); it != dados.end(); it++)
+			{
+
+				// Procura a regiao informada (primeiro dado catalogado)
+				int regiaoAtual = 0; int regiaoInformada = *it;
+				for (forward_list<Regiao>::iterator r = regioes.begin(); r != regioes.end(); r++)
+				{
+					if (regiaoAtual == regiaoInformada)
+					{
+						*it++;
+
+						// Procura o objeto informado (segundo dado catalogado)
+						int objetoAtual = 0; int objetoInformado = *it;
+						for (forward_list<Objeto>::iterator o = r->objetos.begin(); o != r->objetos.end(); o++)
+						{
+							if (objetoAtual == objetoInformado-1)
+							{
+								o->desativarDesenho();
+								r->getObjetos().erase_after(o);
+								break;
+							}
+
+							objetoAtual++;
+						}
+
+
+						break;
+					}
+
+					regiaoAtual++;
+				}
+
+				glutPostRedisplay();
+			}
 		}
 };
 

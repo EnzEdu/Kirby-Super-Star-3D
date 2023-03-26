@@ -26,13 +26,14 @@
 // Bibliotecas
 #include <stdio.h>
 #include <stdlib.h>
+#include <forward_list>
 #include "jogo.h"
 #include "carregaImagem.h"
+#include "mundos/extras.h"
 
 // Declaracao de constantes e variaveis
+double camX = 0.0, camY = 0.00, camZ = 1.5;
 int width = 800, height = 600;
-static char ultimaTecla = '0';
-static int contadorAndando = 0;
 
 
 // Jogador
@@ -42,12 +43,10 @@ Kirby player;
 #include "hud.h"
 HUD hud;
 
-// Fases
 #include "seletor.h"
 SeletorDeMundos seletor;
 
 
-double camX = 0.0, camZ = 1.5;
 
 
 /*
@@ -59,6 +58,7 @@ void reshape(int w, int h);
 void keyboard(unsigned char key, int x, int y);
 void timer(int value);
 void computeFPS();
+void verificaColisao();
 
 //double camX = 0.0, camZ = 1.5;
 
@@ -173,12 +173,12 @@ void display(void)
                                    0.0, 1.0, 0.0);
 */
 
-//
+/*
     gluLookAt(camX, 1.50, camZ,
               camX, 0.00, camZ - 1.5,
               0.00, 1.00, 0.00);
-//
-
+*/
+//    printf("%.2lf %.2lf %.2lf\n", camX, camY, camZ);
     
     // Camera teste
 /*
@@ -193,27 +193,63 @@ void display(void)
 */
 
     // Desenha o mundo a ser jogado
-    seletor.desenhaMundo();
+    if (seletor.getMundoAtual() == 0)
+    {
+        // Seleciona o plano 2D
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, width, 0, height, 0, 1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glClear(GL_DEPTH_BUFFER_BIT);
 
-    // Desenha o jogador
-    player.desenhar();
+        // Desenha o mundo
+        seletor.desenhaMundo();
+    }
+    else
+    {
+        // Seleciona o plano 3D
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glViewport(0, 0, (GLsizei) width, (GLsizei) height);
+        gluPerspective(60, (float)width/(float)height, 0.5, 11.0);
+        glMatrixMode(GL_MODELVIEW);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+        //
+        gluLookAt(0.00, camY + 1.50, camZ,
+                  camX, camY, camZ - 1.5,
+                  0.00, 1.00, 0.00);
+        //
+        /*
+        gluLookAt(0.0, 0.75, 2.0,   // Costas //
+                  0.0, 0.0, 0.0,
+                  0.0, 1.0, 0.0);
+        */
+        // Desenha o mundo
+        seletor.desenhaMundo();
+
+        // Desenha o jogador
+        player.desenhar();
+
+        //
+        verificaColisao();
+
+        // Seleciona o plano 2D
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glViewport(0, 0, width, height);
+        glOrtho(0, width, 0, height, 0, 1);
+        glMatrixMode(GL_MODELVIEW);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+
+        hud.desenhaHUD();
+    }
 
 
-    // Ida ao plano 2D para desenhar o HUD
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, width, 0, height, 0, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glClear(GL_DEPTH_BUFFER_BIT);
 
-    hud.desenhaHUD();
 
-    // Retorna pro plano 3D
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
-    gluPerspective(60, (float)width/(float)height, 0.5, 11.0);
 
     // Troca os buffers, mostrando o que acabou de ser desenhado
     glutSwapBuffers();
@@ -263,7 +299,10 @@ void keyboard(unsigned char key, int x, int y)
                     player.moveKirby(-0.50,  0.00,  0.00);
             
                     // Ajusta a camera
-                    camX = 0.02*(player.getCoordenadaX() / 0.50);
+                    if (camX > -0.54)
+                    {
+                        camX -= 0.02;
+                    }
 
                     // Ajusta a rotacao do jogador
                     player.rotacionaKirby(-90.0);
@@ -289,7 +328,10 @@ void keyboard(unsigned char key, int x, int y)
                     player.moveKirby( 0.50,  0.00,  0.00);
             
                     // Ajusta a camera
-                    camX = 0.02*(player.getCoordenadaX() / 0.50);
+                    if (camX < 0.54)
+                    {
+                        camX += 0.02;
+                    }
 
                     // Ajusta a rotacao do jogador
                     player.rotacionaKirby(90.0);
@@ -307,7 +349,7 @@ void keyboard(unsigned char key, int x, int y)
                 {
                     // Movimenta o jogador
                     player.moveKirby( 0.00,  1.00,  0.00);
-                    
+
                     // Evoca a animacao PULANDO
                     player.playAnimation(3);
                 }
@@ -348,7 +390,7 @@ void keyboard(unsigned char key, int x, int y)
 
 /*
  * Computa a quantidade de frames por segundo da animacao
- */
+ *
 void computeFPS()
 {    
     static GLuint frames = 0;       //Conta os frames em 1000 milissegundos, computando o FPS
@@ -364,4 +406,75 @@ void computeFPS()
     // Evita o reinicio da contagem dos frames na primeira iteracao
     if(next_clock != 0) frames = 0;//Reinicia a contagem dos frames a cada 1000 milissegundos
     next_clock = clock + 1000; //A cada 1000 milissegundos = 1 segundo
+}
+*/
+
+
+
+/*
+ * Computa a quantidade de frames por segundo da animacao
+ */
+void verificaColisao()
+{
+    double kirbyX = player.getCoordenadaX();
+    double kirbyY = player.getCoordenadaY();
+    double kirbyZ = player.getCoordenadaZ();
+
+    // Hitbox do corpo do Kirby
+    //double hitboxKirby[3] = {0.0, 0.0, 0.0};
+
+    // Centro da hitbox?
+    double centroKirby[3] = {kirbyX, kirbyY, kirbyZ};
+
+
+
+
+    // Itera sobre as regioes carregadas
+    for (int i = 6; i < 9; i++)
+    {
+        int regiaoCarregada = objetosMapa[i];
+
+        // Recebe a lista de objetos da regiao
+        forward_list<Objeto> objetos = seletor.getObjetos(regiaoCarregada);
+
+        // Itera sobre os objetos carregados naquela regiao
+        int objetoCarregado = 0;
+        for (forward_list<Objeto>::iterator o = objetos.begin(); o != objetos.end(); o++)
+        {
+            /*
+            // Hitbox da coisa
+            glPushMatrix();
+                glColor3f(0.0, 0.0, 0.0);
+                glTranslatef(o->coordX, o->coordY + 0.85, o->coordZ);
+                glutWireSphere(0.09, 20, 20);
+            glPopMatrix();
+            */
+
+            // Calcula a distancia entre os centros
+            double distancia2 = sqrt(
+                pow((o->coordX - (0.05*kirbyX)), 2) +
+                pow((o->coordY+0.85 - (0.05*(kirbyY+1.7))), 2) +
+                pow((o->coordZ - (0.05*kirbyZ)), 2)
+            );
+
+            // Soma dos raios
+            double somaRaios = (0.05*1.3) + 0.09;
+            if (distancia2 <= somaRaios)
+            {
+                //printf("aaaaaaaa\tdist = %.2lf somaRaios = %.2lf\n", distancia2, somaRaios);
+                printf("Colisao!!!!!!!!!!!\n");
+                
+                Objeto o2;
+                o2.desenhar = true; o2.usarTextura = o->usarTextura;
+                o2.coordX = o->coordX+1.0; o2.coordY = o->coordY; o2.coordZ = o->coordZ;
+                o2.corR = o->corR; o2.corG = o->corG; o2.corB = o->corB;
+                o2.texX1 = o->texX1; o2.texX2 = o->texX2; o2.texY1 = o->texY1; o2.texY2 = o->texY2;
+                objetos.push_front(o2);
+
+                seletor.houveColisao(regiaoCarregada, objetoCarregado);
+            }
+
+            objetoCarregado++;
+        }
+    }
 }

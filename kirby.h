@@ -88,11 +88,12 @@ void Kirby::desenhar()
         glmDrawAnimation(animations[animacao_id], keyframe, GLM_TEXTURE);
     glPopMatrix();
 
+    // Hitbox?
     glPushMatrix();
     	glColor3f(1.0, 0.0, 1.0);
     	glScaled(0.05, 0.05, 0.05);
     	glTranslated(posX, posY+1.7, posZ);
-        glutWireSphere(1.4, 20, 20);				// Hitbox?
+        glutWireSphere(1.3, 20, 20);
     glPopMatrix();
 
 //	printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
@@ -104,6 +105,7 @@ void Kirby::desenhar()
 	if (pause == false && (int) (posY * 100) > 1500)
 	{
 		posY -= 0.02;
+
 		playAnimation(PULANDO);
 		glutPostRedisplay();
 	}
@@ -216,7 +218,12 @@ void Kirby::moveKirby(double valorX, double valorY, double valorZ)
 		keyPlayAnimation(ANDANDO);
 	}
 
-	posX += valorX;
+	// Mantem Kirby dentro do caminho
+	if (posX + valorX > -14.00 && posX + valorX < 14.00)
+	{
+		posX += valorX;
+	}
+
 	posY += valorY;
 	posZ += valorZ;
 }
