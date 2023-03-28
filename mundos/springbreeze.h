@@ -1,7 +1,6 @@
 #ifndef SPRINGBREEZE_H
 #define SPRINGBREEZE_H
 
-//#include "extras.h"
 
 
 class SpringBreeze : public Mundo
@@ -20,17 +19,6 @@ SpringBreeze::SpringBreeze() {
 
 
 	// Instancia as regioes do mundo
-
-		// Cria 10 regioes de campo
-/*
-			for (int i = 0; i < 5; i++)
-			{
-				pushRegiao(0.0, 0.0, (-1.5*i), 
-						   0.000, 0.333, 0.000, 0.333,
-						   0.000, 0.303, 0.503, 1.000);
-			}
-*/
-
 			pushRegiao(0.0, 0.0,   0.0, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.503, 1.000);
 			pushRegiao(0.0, 0.0,  -1.5, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.503, 1.000);
 			pushObjeto('i', false,  0.5, 0.0, -1.5, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
@@ -42,6 +30,7 @@ SpringBreeze::SpringBreeze() {
 			pushRegiao(0.0, 0.0,  -9.0, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.503, 1.000);
 			pushRegiao(0.0, 0.0, -10.5, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.503, 1.000);
 			pushRegiao(0.0, 0.0, -12.0, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.503, 1.000);
+			pushRegiao(0.0, 0.0, -13.5, 0.666, 1.000, 0.000, 0.333, 0.000, 0.333, 0.503, 1.000);
 
 
 	//regioes.push();

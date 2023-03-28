@@ -36,6 +36,10 @@ double camX = 0.0, camY = 0.00, camZ = 1.5;
 int width = 800, height = 600;
 
 
+// Camera
+#include "camera.h"
+Camera camera;
+
 // Jogador
 #include "kirby.h"
 Kirby player;
@@ -60,8 +64,6 @@ void timer(int value);
 void computeFPS();
 void verificaColisao();
 
-//double camX = 0.0, camZ = 1.5;
-
 
 
 
@@ -70,7 +72,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc,argv);                                           // Inicia o GLUT com a passagem de parametros C
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);       // Inicia o Display com o sistema RGB, double-buffering e z-buffering
-    glutInitWindowSize(width, height);                                    // Tamanho da janela do OpenGL
+    glutInitWindowSize(width, height);                              // Tamanho da janela do OpenGL
     glutInitWindowPosition(500,50);                                 // Posicao inicial da janela do OpenGL
     glutCreateWindow("Computacao Grafica: Kirby Super Star 3D");    // Da nome para uma janela OpenGL
 
@@ -96,13 +98,7 @@ int main(int argc, char** argv)
 // Funcao com alguns comandos para a inicializacao do OpenGL
 void init(void)
 {
-    //Define como a textura sera aplicada ao objeto
-//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
-//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-
-
-
-    //Ativa a visualizacao de texturas 2D (Texturizacao 2D)
+    // Ativa a visualizacao de texturas 2D
     glEnable(GL_TEXTURE_2D);
 
     // Ativa o Back-face Culling
@@ -111,15 +107,11 @@ void init(void)
 
 //    glShadeModel( GL_SMOOTH );
 
-    glEnable(GL_DEPTH_TEST);                // Habilita o algoritmo Z-Buffer
+    // Ativa o Z-Buffer
+    glEnable(GL_DEPTH_TEST);
 
-
-    glClearColor (1.0, 1.0, 1.0, 1.0);      // Limpa a tela com a cor branca 
-
-
-    
-    player.carregaModelo();
-
+    // Limpa a tela com a cor branca
+    glClearColor (1.0, 1.0, 1.0, 1.0);
 
     // Ativa o modelo de sombreamento de "Gouraud" (Smooth
     //glShadeModel(GL_SMOOTH);
@@ -131,6 +123,9 @@ void init(void)
     // Ativa o z-buffering, de modo a remover as superficies escondidas
     //glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_LESS);
+
+    // Carrega o modelo do Kirby na memoria
+    player.carregaModelo();
 }
 
 
@@ -216,16 +211,10 @@ void display(void)
         glMatrixMode(GL_MODELVIEW);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
-        //
-        gluLookAt(0.00, camY + 1.50, camZ,
-                  camX, camY, camZ - 1.5,
-                  0.00, 1.00, 0.00);
-        //
-        /*
-        gluLookAt(0.0, 0.75, 2.0,   // Costas //
-                  0.0, 0.0, 0.0,
-                  0.0, 1.0, 0.0);
-        */
+        
+        // Carrega a camera
+        camera.carregaCamera();
+
         // Desenha o mundo
         seletor.desenhaMundo();
 
@@ -287,9 +276,6 @@ void keyboard(unsigned char key, int x, int y)
                     
                     // Ajusta a camera
                     camZ -= 0.025;
-
-                    // Ajusta a rotacao do jogador
-                    //player.rotacionaKirby(180.0);
                 }
             break;
 
@@ -303,9 +289,6 @@ void keyboard(unsigned char key, int x, int y)
                     {
                         camX -= 0.02;
                     }
-
-                    // Ajusta a rotacao do jogador
-                    //player.rotacionaKirby(-90.0);
                 }
             break;
 
@@ -316,9 +299,6 @@ void keyboard(unsigned char key, int x, int y)
             
                     // Ajusta a camera
                     camZ += 0.025;
-
-                    // Ajusta a rotacao do jogador
-                    //player.rotacionaKirby( 0.0);
                 }
             break;
 
@@ -332,33 +312,6 @@ void keyboard(unsigned char key, int x, int y)
                     {
                         camX += 0.02;
                     }
-
-                    // Ajusta a rotacao do jogador
-                    //player.rotacionaKirby(90.0);
-                }
-            break;
-
-            case 'j': case 'J':
-                {
-                    // Evoca a animacao SUGANDO
-                    if (player.estaCheio == false)
-                    {
-                        player.playAnimation(4);
-                    }
-                    else
-                    {
-                        player.soltarObjeto();
-                    }
-                }
-            break;
-
-            case 'k': case 'K':
-                {
-                    printf("cheio=%d\n", player.estaCheio);
-                    if (player.estaCheio == false) // trocar pra true
-                    {
-                        player.soltarObjeto();
-                    }
                 }
             break;
 
@@ -367,8 +320,40 @@ void keyboard(unsigned char key, int x, int y)
                     // Movimenta o jogador
                     player.moveKirby( 0.00,  1.00,  0.00);
 
+                    camY += 0.0025;
+
                     // Evoca a animacao PULANDO
                     player.playAnimation(3);
+                }
+            break;
+
+            case 'j': case 'J':
+                {
+                    // Evoca a animacao ASPIRANDO
+                    player.playAnimation(4);
+                }
+            break;
+
+
+
+            case 'c': case 'C':
+                {
+                    // Muda a camera do jogo
+                    if (tipoCamera < 1)
+                    {
+                        tipoCamera++;
+                    }
+                    else
+                    {
+                        tipoCamera = 0;
+                    }
+                }
+            break;
+
+            case 'h': case 'H':
+                {
+                    // Ativa e desativa as hitbox
+                    hitbox = !hitbox;
                 }
             break;
 
@@ -433,17 +418,10 @@ void computeFPS()
  */
 void verificaColisao()
 {
+    // Pega as coordenadas do Kirby
     double kirbyX = player.getCoordenadaX();
     double kirbyY = player.getCoordenadaY();
     double kirbyZ = player.getCoordenadaZ();
-
-    // Hitbox do corpo do Kirby
-    //double hitboxKirby[3] = {0.0, 0.0, 0.0};
-
-    // Centro da hitbox?
-    double centroKirby[3] = {kirbyX, kirbyY, kirbyZ};
-
-
 
 
     // Itera sobre as regioes carregadas
@@ -545,7 +523,7 @@ void verificaColisao()
                                 hitboxArAspirado[2] = 0.05*kirbyZ;
                             }
                         break;
-                        case 2: // Olhando pra TRAS
+                        case 2: // Olhando pra COSTAS
                             {
                                 hitboxArAspirado[0] = 0.05*kirbyX;
                                 hitboxArAspirado[1] = 0.05*(kirbyY + 1.7);
@@ -593,7 +571,6 @@ void verificaColisao()
                         {
                             seletor.houveColisao(regiaoCarregada, objetoCarregado, 0);
                             player.incrementaScore();
-                            //Objeto absorvido = *o;
                             player.absorverObjeto(*o);
                         }
                     }

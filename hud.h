@@ -5,22 +5,19 @@
 
 class HUD
 {
-	private: // Variaveis
-		char   poder				= '_';
-
-
-	public: // Funcoes
-		HUD 						();
-		void   desenhaHUD			();
+	public:
+				HUD 				();
+		void	desenhaHUD			();
 };
 
-
-// Desenha o Kirby
 HUD::HUD()
 {
 	//
 }
 
+/*
+ *	Funcao que desenha o HUD
+ */
 void HUD::desenhaHUD()
 {
 	// Escreve as informacoes no espaco do HUD
@@ -28,13 +25,12 @@ void HUD::desenhaHUD()
     glColor3f(0.0, 0.0, 0.0);
     draw_text_stroke(85, 70, "Score: " + to_string(player.getScore()), 0.15);
     draw_text_stroke(85, 45, "Vidas: " + to_string(player.getVidas()), 0.15);
+    draw_text_stroke(85, 20, "Camera: " + to_string(tipoCamera), 0.15);
 
-    draw_text_stroke(width - 145, 70, "Camera: ", 0.15);
-    draw_text_stroke(width - 145, 45, to_string(camX).substr(0, 5), 0.10);
-    draw_text_stroke(width - 145, 30, to_string(camY).substr(0, 5), 0.10);
-    draw_text_stroke(width - 145, 15, to_string(camZ).substr(0, 5), 0.10);
+    draw_text_stroke(width - 145, 70, to_string(player.getCoordenadaX()).substr(0, 5), 0.15);
+    draw_text_stroke(width - 145, 45, to_string(player.getCoordenadaY()).substr(0, 5), 0.15);
+    draw_text_stroke(width - 145, 20, to_string(player.getCoordenadaZ()).substr(0, 5), 0.15);
     glEnable(GL_TEXTURE_2D);
-
 
 
 

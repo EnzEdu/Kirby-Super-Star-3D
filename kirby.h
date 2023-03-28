@@ -9,7 +9,7 @@
 class Kirby
 {
 	private:
-		enum animacoes_ids {PAUSADO, IDLE, ANDANDO, PULANDO, SUGANDO, CHEIO};
+		enum animacoes_ids {PAUSADO, IDLE, ANDANDO, PULANDO, ASPIRANDO, CHEIO};
 		enum direcoes_ids {FRENTE, ESQUERDA, COSTAS, DIREITA};
 
 		int keyframe 				= 0;
@@ -80,8 +80,8 @@ void Kirby::carregaModelo()
     animations[PULANDO] = animation;
     printf(".");
     
-    animation = glmLoadAnimation("player/anm/sugando/sugando.obj", SUGANDO, 1);
-    animations[SUGANDO] = animation;
+    animation = glmLoadAnimation("player/anm/aspirando/aspirando.obj", ASPIRANDO, 1);
+    animations[ASPIRANDO] = animation;
     printf(".");
 
     animation = glmLoadAnimation("player/anm/cheio/cheio.obj", CHEIO, 1);
@@ -93,6 +93,7 @@ void Kirby::carregaModelo()
 // Desenha o Kirby
 void Kirby::desenhar()
 {
+	// Situacao usual
 	if (contadorInvulneravel == 0)
 	{
 		// Define o modo de textura
@@ -109,12 +110,15 @@ void Kirby::desenhar()
     	glPopMatrix();
     }
 
+    // Recebimento de dano
     else
     {
     	// Define o modo de textura
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 	
 	    glPushMatrix();
+
+	    	// Kirby mudando de cor frame a frame
 		    if (contadorInvulneravel % 2 == 0)
 		    {
 			    glColor3f(1.0, 0.0, 0.0);
@@ -123,6 +127,7 @@ void Kirby::desenhar()
 			{
 				glColor3f(0.0, 0.0, 1.0);
 			}
+
     		glScaled(0.05, 0.05, 0.05);
 	    	glTranslated(posX, posY, posZ);
     	    glRotatef(rotX, 1.0f, 0.0f, 0.0f);
@@ -132,43 +137,32 @@ void Kirby::desenhar()
     	glPopMatrix();
     }
 
-    // Hitbox?
-    glPushMatrix();
-    	glColor3f(1.0, 0.0, 1.0);
-    	glScaled(0.05, 0.05, 0.05);
-    	glTranslated(posX, posY+1.7, posZ);
-        glutWireSphere(1.3, 20, 20);
-    glPopMatrix();
-
-    if (animacao_id == SUGANDO)
+    if (hitbox == true)
     {
-    	glPushMatrix();
-    		glColor3f(1.0, 1.0, 1.0);
+    	// Hitbox do Kirby
+	    glPushMatrix();
+    		glColor3f(1.0, 0.0, 1.0);
     		glScaled(0.05, 0.05, 0.05);
-    		switch (olhando)
-    		{
-		    	case FRENTE:	glTranslated(posX, posY+1.7, posZ-3.0);		break;
-		    	case COSTAS:	glTranslated(posX, posY+1.7, posZ+3.0);		break;
-		    	case ESQUERDA:	glTranslated(posX-2.5, posY+1.7, posZ);		break;
-		    	case DIREITA:	glTranslated(posX+2.5, posY+1.7, posZ);		break;
-    		}
-    	    glutWireCube(2.5);
-	    glPopMatrix();
-    }
-    else if (estaCheio == true) // animacao_id == CHEIO
-    {
-    	glPushMatrix();
-    		glColor3f(boca.corR, boca.corG, boca.corB);
-    		//glScaled(0.05, 0.05, 0.05);
-    		switch (olhando)
-    		{
-		    	case FRENTE:	glTranslated(posX, posY+1.7, posZ-3.0);		break;
-		    	case COSTAS:	glTranslated(posX, posY+1.7, posZ+3.0);		break;
-		    	case ESQUERDA:	glTranslated(posX-2.5, posY+1.7, posZ);		break;
-		    	case DIREITA:	glTranslated(posX+2.5, posY+1.7, posZ);		break;
-    		}
-    	    glutWireCube(2.5);
-	    glPopMatrix();
+	    	glTranslated(posX, posY+1.7, posZ);
+    	    glutWireSphere(1.3, 20, 20);
+    	glPopMatrix();
+
+    	// Hitbox do ar aspirado
+	    if (animacao_id == ASPIRANDO)
+    	{
+	    	glPushMatrix();
+    			glColor3f(1.0, 1.0, 1.0);
+    			glScaled(0.05, 0.05, 0.05);
+    			switch (olhando)
+	    		{
+		    		case FRENTE:	glTranslated(posX, posY+1.7, posZ-3.0);		break;
+			    	case COSTAS:	glTranslated(posX, posY+1.7, posZ+3.0);		break;
+			    	case ESQUERDA:	glTranslated(posX-2.5, posY+1.7, posZ);		break;
+			    	case DIREITA:	glTranslated(posX+2.5, posY+1.7, posZ);		break;
+    			}
+    		    glutWireCube(2.5);
+		    glPopMatrix();
+	    }
     }
 
 //	printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
@@ -180,7 +174,7 @@ void Kirby::desenhar()
 	if (pause == false && (int) (posY * 100) > 1500)
 	{
 		posY -= 0.02;
-
+		camY -= 0.0025;
 		playAnimation(PULANDO);
 		glutPostRedisplay();
 	}
