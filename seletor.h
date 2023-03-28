@@ -12,6 +12,7 @@ class SeletorDeMundos
 		 				  int getMundoAtual			();
 		 forward_list<Objeto> getObjetos			(int idRegiao);
 		 				 void houveColisao			(int idRegiao, int idObjeto, int modo);
+		 				 void alteraMundo			(int idMundo);
 
 	private:
 					    Start start;
@@ -26,7 +27,7 @@ class SeletorDeMundos
 SeletorDeMundos::SeletorDeMundos()
 {
 	// Inicializa o id da mundo atual
-	mundoAtual = 1;		// Eh pra ser 0
+	mundoAtual = 0;		// Eh pra ser 0
 }
 
 /*
@@ -65,6 +66,11 @@ forward_list<Objeto> SeletorDeMundos::getObjetos(int idRegiao)
 	return nada;
 }
 
+
+void SeletorDeMundos::alteraMundo(int idMundo)
+{
+	mundoAtual = idMundo;
+}
 void SeletorDeMundos::houveColisao(int idRegiao, int idObjeto, int modo)
 {
 	forward_list<int> dados;

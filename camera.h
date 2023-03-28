@@ -13,7 +13,7 @@ void Camera::carregaCamera()
 	{
 		case 0:		// Camera de ombro
 			{
-		        gluLookAt(0.00, camY + 1.50,    camZ   ,
+		        gluLookAt(camX, camY + 1.50,    camZ   ,
          		          0.00,     camY   , camZ - 1.5,
                 		  0.00,     1.00   ,    0.00   );
 			}

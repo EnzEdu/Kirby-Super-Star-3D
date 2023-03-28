@@ -35,5 +35,8 @@ bool pause = false;
 bool hitbox = false;
 
 
+// Variavel que representa o teclado
+bool teclado[255];
+
 
 #endif

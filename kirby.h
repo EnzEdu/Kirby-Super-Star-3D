@@ -174,7 +174,7 @@ void Kirby::desenhar()
 	if (pause == false && (int) (posY * 100) > 1500)
 	{
 		posY -= 0.02;
-		camY -= 0.0025;
+		camY -= 0.0001;
 		playAnimation(PULANDO);
 		glutPostRedisplay();
 	}

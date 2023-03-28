@@ -124,6 +124,9 @@ void init(void)
     //glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_LESS);
 
+    // Carrega o teclado
+    std::fill_n(teclado, 255, false);
+
     // Carrega o modelo do Kirby na memoria
     player.carregaModelo();
 }
@@ -264,7 +267,15 @@ void keyboard(unsigned char key, int x, int y)
 {
     //printf("key = %c\n", key);
 
-    if (pause == false)
+    if (seletor.getMundoAtual() == 0)
+    {
+        if (key == 's' || key == 'S')
+        {
+            seletor.alteraMundo(1);
+        }
+    }
+
+    else if (pause == false)
     {
         switch (key) {
 
@@ -320,7 +331,7 @@ void keyboard(unsigned char key, int x, int y)
                     // Movimenta o jogador
                     player.moveKirby( 0.00,  1.00,  0.00);
 
-                    camY += 0.0025;
+                    camY += 0.005;
 
                     // Evoca a animacao PULANDO
                     player.playAnimation(3);
@@ -436,13 +447,15 @@ void verificaColisao()
         int objetoCarregado = 0;
         for (forward_list<Objeto>::iterator o = objetos.begin(); o != objetos.end(); o++)
         {
-            
-            // Hitbox da coisa
-            glPushMatrix();
-                glColor3f(0.0, 0.0, 0.0);
-                glTranslatef(o->coordX, o->coordY + 0.85, o->coordZ);
-                glutWireCube(0.1);
-            glPopMatrix();
+            if (hitbox == true)
+            {
+                // Hitbox da coisa
+                glPushMatrix();
+                    glColor3f(0.0, 0.0, 0.0);
+                    glTranslatef(o->coordX, o->coordY + 0.85, o->coordZ);
+                    glutWireCube(0.1);
+                glPopMatrix();
+            }
 
 
             /* Verifica colisao Esfera-AABB
