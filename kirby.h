@@ -9,7 +9,8 @@
 class Kirby
 {
 	private:
-		enum animacoes_ids {PAUSADO, IDLE, ANDANDO, PULANDO, SUGANDO};
+		enum animacoes_ids {PAUSADO, IDLE, ANDANDO, PULANDO, SUGANDO, CHEIO};
+		enum direcoes_ids {FRENTE, ESQUERDA, COSTAS, DIREITA};
 
 		int keyframe 				= 0;
 		//GLuint mode 				= GLM_SMOOTH;		// Modo de sombreamento
@@ -19,33 +20,45 @@ class Kirby
 		double raio = 0.0625;
 		double posX =  0.00, rotX = 0;
 		double posY = 15.00, rotY = 180;
-		double posZ =  10.00, rotZ = 0;
+		double posZ = 10.00, rotZ = 0;
 
+		int vidas = 3;
+		int score = 0;
+		Objeto boca;
 
 	public:
 		bool pulando = false;
+		bool estaCheio = false;
+		int olhando = FRENTE;
 		int animacao_id = IDLE;
 		int animacao_atual = IDLE;
 		int contadorParado = 0;
+		int contadorInvulneravel = 0;
+
 
 		void	carregaModelo		();
-		void atualizaKeyframe		();
-		void    playAnimation 		(int id);
-		void keyPlayAnimation		(int id);
+		void	atualizaKeyframe	();
+		void	playAnimation 		(int id);
+		void	keyPlayAnimation	(int id);
 
-		void   desenhar				();
-		void   moveKirby			(double valorX, double valorY, double valorZ);
-		void   rotacionaKirby		(double valorY);
-		double getCoordenadaX		();
-		double getCoordenadaY		();
-		double getCoordenadaZ		();
-		double getRotacaoY			();
-
-		int    verificaRegioes		(int numBlocosMapa);
+		void	desenhar			();
+		void	moveKirby			(double valorX, double valorY, double valorZ);
+		void 	incrementaScore		();
+		void	absorverObjeto		(Objeto obj);
+		void 	soltarObjeto		();
+		void	perdeVida			();
+		void 	reset				();
+		double	getCoordenadaX		();
+		double	getCoordenadaY		();
+		double	getCoordenadaZ		();
+		int 	getAnimacao			();
+		int 	getDirecao			();
+		int 	getVidas			();
+		int 	getScore			();
 };
 
-GLManimation *animation = NULL;   //Ponteiro usado no armazenamento de uma animacao
-map <int, GLManimation *> animations; //Mapeamento dos identificadores com as animacoes
+GLManimation *animation = NULL;   // Ponteiro usado no armazenamento de uma animacao
+map <int, GLManimation *> animations; // Mapeamento dos identificadores com as animacoes
 
 
 // Carrega o modelo 3D do Kirby
@@ -69,6 +82,10 @@ void Kirby::carregaModelo()
     
     animation = glmLoadAnimation("player/anm/sugando/sugando.obj", SUGANDO, 1);
     animations[SUGANDO] = animation;
+    printf(".");
+
+    animation = glmLoadAnimation("player/anm/cheio/cheio.obj", CHEIO, 1);
+    animations[CHEIO] = animation;
     printf(".\n");
 }
 
@@ -76,17 +93,44 @@ void Kirby::carregaModelo()
 // Desenha o Kirby
 void Kirby::desenhar()
 {
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	if (contadorInvulneravel == 0)
+	{
+		// Define o modo de textura
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	
-    glPushMatrix();
-	    glColor3f(1.0, 0.0, 1.0);
-    	glScaled(0.05, 0.05, 0.05);
-    	glTranslated(posX, posY, posZ);
-        glRotatef(rotX, 1.0f, 0.0f, 0.0f);
-        glRotatef(rotY, 0.0f, 1.0f, 0.0f);
-        glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
-        glmDrawAnimation(animations[animacao_id], keyframe, GLM_TEXTURE);
-    glPopMatrix();
+	    glPushMatrix();
+		    glColor3f(1.0, 0.0, 1.0);
+    		glScaled(0.05, 0.05, 0.05);
+	    	glTranslated(posX, posY, posZ);
+    	    glRotatef(rotX, 1.0f, 0.0f, 0.0f);
+        	glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+	        glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
+    	    glmDrawAnimation(animations[animacao_id], keyframe, GLM_TEXTURE);
+    	glPopMatrix();
+    }
+
+    else
+    {
+    	// Define o modo de textura
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+	
+	    glPushMatrix();
+		    if (contadorInvulneravel % 2 == 0)
+		    {
+			    glColor3f(1.0, 0.0, 0.0);
+			}
+			else
+			{
+				glColor3f(0.0, 0.0, 1.0);
+			}
+    		glScaled(0.05, 0.05, 0.05);
+	    	glTranslated(posX, posY, posZ);
+    	    glRotatef(rotX, 1.0f, 0.0f, 0.0f);
+        	glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+	        glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
+    	    glmDrawAnimation(animations[animacao_id], keyframe, GLM_TEXTURE);
+    	glPopMatrix();
+    }
 
     // Hitbox?
     glPushMatrix();
@@ -95,6 +139,37 @@ void Kirby::desenhar()
     	glTranslated(posX, posY+1.7, posZ);
         glutWireSphere(1.3, 20, 20);
     glPopMatrix();
+
+    if (animacao_id == SUGANDO)
+    {
+    	glPushMatrix();
+    		glColor3f(1.0, 1.0, 1.0);
+    		glScaled(0.05, 0.05, 0.05);
+    		switch (olhando)
+    		{
+		    	case FRENTE:	glTranslated(posX, posY+1.7, posZ-3.0);		break;
+		    	case COSTAS:	glTranslated(posX, posY+1.7, posZ+3.0);		break;
+		    	case ESQUERDA:	glTranslated(posX-2.5, posY+1.7, posZ);		break;
+		    	case DIREITA:	glTranslated(posX+2.5, posY+1.7, posZ);		break;
+    		}
+    	    glutWireCube(2.5);
+	    glPopMatrix();
+    }
+    else if (estaCheio == true) // animacao_id == CHEIO
+    {
+    	glPushMatrix();
+    		glColor3f(boca.corR, boca.corG, boca.corB);
+    		//glScaled(0.05, 0.05, 0.05);
+    		switch (olhando)
+    		{
+		    	case FRENTE:	glTranslated(posX, posY+1.7, posZ-3.0);		break;
+		    	case COSTAS:	glTranslated(posX, posY+1.7, posZ+3.0);		break;
+		    	case ESQUERDA:	glTranslated(posX-2.5, posY+1.7, posZ);		break;
+		    	case DIREITA:	glTranslated(posX+2.5, posY+1.7, posZ);		break;
+    		}
+    	    glutWireCube(2.5);
+	    glPopMatrix();
+    }
 
 //	printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
     
@@ -108,6 +183,12 @@ void Kirby::desenhar()
 
 		playAnimation(PULANDO);
 		glutPostRedisplay();
+	}
+
+	//
+	if (contadorInvulneravel != 0)
+	{
+		contadorInvulneravel--;
 	}
 }
 
@@ -226,11 +307,29 @@ void Kirby::moveKirby(double valorX, double valorY, double valorZ)
 
 	posY += valorY;
 	posZ += valorZ;
-}
 
-void Kirby::rotacionaKirby(double valorY)
-{
-	rotY = valorY;
+
+	// Atualiza a direcao pra onde esta olhando
+	if (valorZ < 0)
+	{
+		olhando = FRENTE;
+		rotY = 180.0;
+	}
+	else if (valorX < 0)
+	{
+		olhando = ESQUERDA;
+		rotY = -90.0;
+	}
+	else if (valorZ > 0)
+	{
+		olhando = COSTAS;
+		rotY = 0.0;
+	}
+	else if (valorX > 0)
+	{
+		olhando = DIREITA;
+		rotY = 90.0;
+	}
 }
 
 // Funcoes que retornam as coordenadas do Kirby
@@ -249,38 +348,90 @@ double Kirby::getCoordenadaZ()
 	return posZ;
 }
 
-double Kirby::getRotacaoY()
+int Kirby::getAnimacao()
 {
-	return rotY;
+	return animacao_id;
+}
+
+int Kirby::getDirecao()
+{
+	return olhando;
 }
 
 
-
-// Verifica se o jogador consegue ver outra regiao, alem da regiao em que esta atualmente
-// (usado para carregar regioes por demanda)
-// abstracao "Regiao" = (Parede esquerda, Chao, Parede direita)
-int Kirby::verificaRegioes(int numRegioesMapa)
+void Kirby::absorverObjeto(Objeto obj)
 {
-	// Cria uma lista das posicoes no eixo Z que visualizam a regiao de baixo
-	double limitesRegiaoBaixo[numRegioesMapa];
-	for (int i = 0; i < numRegioesMapa; i++)
-	{
-		limitesRegiaoBaixo[i] =  0.04 - (1.5 * i);
-		printf("%.2f\t", limitesRegiaoBaixo[i]);
-	}
-	printf("\n");
+	keyPlayAnimation(CHEIO);
+//	if (obj.tipo ==)
+	printf("%.2lf\n", obj.coordX);
+}
 
-	// Verifica se a posicao do jogador no eixo Z esta na lista
-	for (int i = 0; i < numRegioesMapa; i++)
+
+void Kirby::soltarObjeto()
+{
+	/*
+		glPushMatrix();
+			glColor3f(1.0, 0.0, 0.0);
+    		glScaled(0.05, 0.05, 0.05);
+    		switch (olhando)
+    		{
+		    	case FRENTE:	glTranslated(posX, posY+1.7, posZ-3.0);		break;
+		    	case COSTAS:	glTranslated(posX, posY+1.7, posZ+3.0);		break;
+		    	case ESQUERDA:	glTranslated(posX-2.5, posY+1.7, posZ);		break;
+		    	case DIREITA:	glTranslated(posX+2.5, posY+1.7, posZ);		break;
+    		}
+    	    //glutWireCube(2.5);
+			glutSolidCube(0.1);
+		glPopMatrix();
+		*/
+	//estaCheio = false;
+
+}
+
+
+void Kirby::incrementaScore()
+{
+	score += 1200;
+}
+
+
+int Kirby::getScore()
+{
+	return score;
+}
+
+
+void Kirby::perdeVida()
+{
+	if (contadorInvulneravel == 0)
 	{
-		if (posZ > limitesRegiaoBaixo[i])
+		vidas--;
+		contadorInvulneravel = 100;
+
+		if (vidas == 0)
 		{
-			return i;
-			break;
+			reset();
 		}
 	}
+}
 
-	return numRegioesMapa;
+int Kirby::getVidas()
+{
+	return vidas;
+}
+
+void Kirby::reset()
+{
+	posX =  0.00;
+	posY = 15.00;
+	posZ = 10.00;
+	rotY = 180;
+	olhando = FRENTE;
+	vidas = 3;
+
+	camX = 0.0;
+	camY = 0.0;
+	camZ = 1.5;
 }
 
 #endif

@@ -1,7 +1,7 @@
-/*  GIMP header image file format (RGB): /home/enzo/Desktop/kirby/texturasMapa.h  */
+/*  GIMP header image file format (RGB): /home/enzo/Desktop/CG/CG.aGame_EnzoEduardo/img/texturaMundo1.h  */
 
-static unsigned int tilesWidth = 48;
-static unsigned int tilesHeight = 32;
+static unsigned int springBreezeWidth = 48;
+static unsigned int springBreezeHeight = 32;
 
 /*  Call this macro repeatedly.  After each use, the pixel data can be extracted  */
 
@@ -11,7 +11,8 @@ pixel[1] = ((((data[1] - 33) & 0xF) << 4) | ((data[2] - 33) >> 2)); \
 pixel[2] = ((((data[2] - 33) & 0x3) << 6) | ((data[3] - 33))); \
 data += 4; \
 }
-static const char *header_data_tiles =
+
+static const char *header_data_springBreeze =
 	".9!#G?61G?61G?61:DERDV9\\DV9\\DV9\\DV9\\DV9\\DV9\\:DERG?61G?61G?61.9!#"
 	"'T=).9!#;LYQ.9!#FJMZFJMZFJMZFJMZFJMZFJMZFJMZFJMZ.9!#.9!#.9!#'T=)"
 	"``)!``)!``)!``)!``)!``)!``)!`Y9!`Y9!``)!``)!``)!``)!``)!``)!``)!"

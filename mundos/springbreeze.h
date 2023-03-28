@@ -31,25 +31,17 @@ SpringBreeze::SpringBreeze() {
 			}
 */
 
-			pushRegiao(0.0, 0.0, 0.0, 
-					   0.000, 0.333, 0.000, 0.333,
-					   0.000, 0.303, 0.503, 1.000);
-			pushObjeto(true, false, 0.5, 0.0, 0.0, 
-				              1.0, 0.0, 1.0,
-				              0.0, 0.0, 0.0, 0.0);
-			pushObjeto(true, false, -0.5, 0.0, 0.4, 
-				              1.0, 0.0, 1.0,
-				              0.0, 0.0, 0.0, 0.0);
-			pushRegiao(0.0, 0.5, -1.5, 
-					   0.000, 0.333, 0.000, 0.333,
-					   0.000, 0.303, 0.503, 1.000);
-
-			for (int i = 2; i < 5; i++)
-			{
-				pushRegiao(0.0, 0.0, (-1.5*i),
-						   0.000, 0.333, 0.000, 0.333,
-						   0.000, 0.303, 0.503, 1.000);
-			}
+			pushRegiao(0.0, 0.0,   0.0, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.503, 1.000);
+			pushRegiao(0.0, 0.0,  -1.5, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.503, 1.000);
+			pushObjeto('i', false,  0.5, 0.0, -1.5, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+			pushObjeto('c', false, -0.5, 0.0, -1.5, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+			pushRegiao(0.0, 0.0,  -3.0, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.503, 1.000);
+			pushRegiao(0.0, 0.0,  -4.5, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.503, 1.000);
+			pushRegiao(0.0, 0.0,  -6.0, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.503, 1.000);
+			pushRegiao(0.0, 0.0,  -7.5, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.503, 1.000);
+			pushRegiao(0.0, 0.0,  -9.0, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.503, 1.000);
+			pushRegiao(0.0, 0.0, -10.5, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.503, 1.000);
+			pushRegiao(0.0, 0.0, -12.0, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.503, 1.000);
 
 
 	//regioes.push();
@@ -100,12 +92,11 @@ void SpringBreeze::desenhar()
 		listaRegioesCarregadas[2] = regiaoMaisDistante;
 	}
 
-//	printf("kirbyY = %.2lf\tkirbyZ = %.2lf\tregiaoMaisDistante = %d\n", player.getCoordenadaY(), player.getCoordenadaZ(), regiaoMaisDistante);
-//	printf("lista = %d %d %d\n", listaRegioesCarregadas[0], listaRegioesCarregadas[1], listaRegioesCarregadas[2]);
-//	printf("%.2lf %.2lf\n", camZ, camZ-1.5);
 
 
-	// Percorre a lista de regioes do mundo
+	/*
+	 *	Carregamento Dinamico das Regioes
+	 */
 	int regiaoAtual = 0;
 	for (forward_list<Regiao>::iterator r = regioes.begin(); r != regioes.end(); r++)
 	{
@@ -120,6 +111,9 @@ void SpringBreeze::desenhar()
 			regiaoAtual == listaRegioesCarregadas[1] ||
 			regiaoAtual == listaRegioesCarregadas[2])
 		{
+			// Define o modo de textura
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
 			// Seleciona o mapeamento de textura do mapa
 			glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);
 
@@ -232,8 +226,8 @@ void SpringBreeze::desenhar()
 			// Desenha os objetos da regiao
 			for (forward_list<Objeto>::iterator o = r->objetos.begin(); o != r->objetos.end(); o++)
 			{
-				if (o->desenhar == true)
-				{
+				//if (o->desenhar == true)
+				//{
 					if (o->usarTextura == false)
 					{
 						glBindTexture(GL_TEXTURE_2D, 0);
@@ -244,7 +238,7 @@ void SpringBreeze::desenhar()
 							glutSolidCube(0.1);
 						glPopMatrix();
 					}
-				}
+				//}
 			}
 		}
 

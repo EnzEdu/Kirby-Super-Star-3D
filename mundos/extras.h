@@ -12,21 +12,23 @@
 
 
 /* Estrutura de classe de um "objeto" dentro de um mundo
- * Pode caracterizar um coletavel, um inimigo...
+ * Pode caracterizar um comida, um inimigo...
  */
 class Objeto
 {
 	public:
-		bool desenhar;
+		char tipo;			// c = comida, i = inimigo
 		bool usarTextura;
 		float coordX, coordY, coordZ;
 		float corR, corG, corB;
 		float texX1, texX2, texY1, texY2;
-
-		void desativarDesenho()
+		/*
+		void moveObjeto(float coordX, float coordY, float coordZ)
 		{
-			desenhar = false;
-		}
+			coordX += coordX;
+			coordY += coordY;
+			coordZ += coordZ;
+		*/
 };
 
 
@@ -104,13 +106,13 @@ class Mundo
 		 * Funcao que cria um objeto e coloca na lista de objetos
 		 * da regiao que esta no topo da lista de regioes
 		 */
-		void pushObjeto(bool desenhar, bool usarTextura,
+		void pushObjeto(char tipo, bool usarTextura,
 						float coordX, float coordY, float coordZ,
 						float corR, float corG, float corB,
 						float texX1, float texX2, float texY1, float texY2)
 		{
 			Objeto o;
-			o.desenhar = desenhar; o.usarTextura = usarTextura;
+			o.tipo = tipo; o.usarTextura = usarTextura;
 			o.coordX = coordX; o.coordY = coordY; o.coordZ = coordZ;
 			o.corR = corR; o.corG = corG; o.corB = corB;
 			o.texX1 = texX1; o.texX2 = texX2; o.texY1 = texY1; o.texY2 = texY2;
@@ -118,42 +120,65 @@ class Mundo
 			regioes.front().objetos.push_front(o);
 		}
 
+		forward_list<Regiao> getRegioes()
+		{
+			return regioes;
+		}
+
 		void setEstadoObjeto(forward_list<int> dados)
-		{			
-			// Itera sobre os dados retornados (regiao e objeto)
-			for (forward_list<int>::iterator it = dados.begin(); it != dados.end(); it++)
+		{
+			// Iterador dos dados retornados (regiao e objeto)
+			forward_list<int>::iterator it = dados.before_begin();
+
+			// Identifica a regiao informada (primeiro dado catalogado)
+			advance(it, 1);
+			int regiaoInformada = *it;
+			forward_list<Regiao>::iterator r = regioes.begin();
+			advance(r, regiaoInformada);
+
+
+			// Identifica o objeto anterior ao informado
+			advance(it, 1);
+			int objetoInformado = *it;
+
+			// Identifica o modo informado
+			advance(it, 1);
+			int modoInformado = *it;
+
+			forward_list<Objeto>::iterator o = r->objetos.before_begin();
+			advance(o, objetoInformado);
+
+
+			//
+			if (modoInformado == 0)
 			{
+				// Remove o objeto seguinte (o objeto informado)
+				r->getObjetos().erase_after(o);
+			}
+			else
+			{
+				
+				//printf("x=%.2lf\n", o->coordX);
+				//o->moveObjeto(0.01, 0.00, 0.00);
+				advance(o, 1);
+				Objeto obj;
+				obj.tipo = o->tipo; obj.usarTextura = o->usarTextura;
+				obj.coordX = o->coordX - 0.01; obj.coordY = o->coordY; obj.coordZ = o->coordZ;
+				obj.corR = o->corR; obj.corG = o->corG; obj.corB = o->corB;
+				obj.texX1 = o->texX1; obj.texX2 = o->texX2; obj.texY1 = o->texY1; obj.texY2 = o->texY2;
+				
+//				printf("a\n");
+				
+				forward_list<Objeto>::iterator objs = r->objetos.before_begin();
+				advance(objs, objetoInformado);
 
-				// Procura a regiao informada (primeiro dado catalogado)
-				int regiaoAtual = 0; int regiaoInformada = *it;
-				for (forward_list<Regiao>::iterator r = regioes.begin(); r != regioes.end(); r++)
-				{
-					if (regiaoAtual == regiaoInformada)
-					{
-						*it++;
+//				printf("b\n");
 
-						// Procura o objeto informado (segundo dado catalogado)
-						int objetoAtual = 0; int objetoInformado = *it;
-						for (forward_list<Objeto>::iterator o = r->objetos.begin(); o != r->objetos.end(); o++)
-						{
-							if (objetoAtual == objetoInformado-1)
-							{
-								o->desativarDesenho();
-								r->getObjetos().erase_after(o);
-								break;
-							}
-
-							objetoAtual++;
-						}
-
-
-						break;
-					}
-
-					regiaoAtual++;
-				}
-
-				glutPostRedisplay();
+				r->getObjetos().erase_after(objs);
+				r->getObjetos().emplace_after(objs, obj);
+				
+//				printf("c\n");
+//				printf("%ld\n", distance(r->getObjetos().begin(), r->getObjetos().end()));
 			}
 		}
 };

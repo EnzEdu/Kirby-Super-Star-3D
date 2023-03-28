@@ -11,7 +11,7 @@ class SeletorDeMundos
 						 void desenhaMundo			();
 		 				  int getMundoAtual			();
 		 forward_list<Objeto> getObjetos			(int idRegiao);
-		 				 void houveColisao			(int idRegiao, int idObjeto);
+		 				 void houveColisao			(int idRegiao, int idObjeto, int modo);
 
 	private:
 					    Start start;
@@ -65,9 +65,10 @@ forward_list<Objeto> SeletorDeMundos::getObjetos(int idRegiao)
 	return nada;
 }
 
-void SeletorDeMundos::houveColisao(int idRegiao, int idObjeto)
+void SeletorDeMundos::houveColisao(int idRegiao, int idObjeto, int modo)
 {
 	forward_list<int> dados;
+	dados.push_front(modo);
 	dados.push_front(idObjeto);
 	dados.push_front(idRegiao);
 	

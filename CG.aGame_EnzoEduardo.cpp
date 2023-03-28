@@ -289,7 +289,7 @@ void keyboard(unsigned char key, int x, int y)
                     camZ -= 0.025;
 
                     // Ajusta a rotacao do jogador
-                    player.rotacionaKirby(180.0);
+                    //player.rotacionaKirby(180.0);
                 }
             break;
 
@@ -305,7 +305,7 @@ void keyboard(unsigned char key, int x, int y)
                     }
 
                     // Ajusta a rotacao do jogador
-                    player.rotacionaKirby(-90.0);
+                    //player.rotacionaKirby(-90.0);
                 }
             break;
 
@@ -318,7 +318,7 @@ void keyboard(unsigned char key, int x, int y)
                     camZ += 0.025;
 
                     // Ajusta a rotacao do jogador
-                    player.rotacionaKirby( 0.0);
+                    //player.rotacionaKirby( 0.0);
                 }
             break;
 
@@ -334,14 +334,31 @@ void keyboard(unsigned char key, int x, int y)
                     }
 
                     // Ajusta a rotacao do jogador
-                    player.rotacionaKirby(90.0);
+                    //player.rotacionaKirby(90.0);
                 }
             break;
 
             case 'j': case 'J':
                 {
                     // Evoca a animacao SUGANDO
-                    player.playAnimation(4);
+                    if (player.estaCheio == false)
+                    {
+                        player.playAnimation(4);
+                    }
+                    else
+                    {
+                        player.soltarObjeto();
+                    }
+                }
+            break;
+
+            case 'k': case 'K':
+                {
+                    printf("cheio=%d\n", player.estaCheio);
+                    if (player.estaCheio == false) // trocar pra true
+                    {
+                        player.soltarObjeto();
+                    }
                 }
             break;
 
@@ -441,37 +458,146 @@ void verificaColisao()
         int objetoCarregado = 0;
         for (forward_list<Objeto>::iterator o = objetos.begin(); o != objetos.end(); o++)
         {
-            /*
+            
             // Hitbox da coisa
             glPushMatrix();
                 glColor3f(0.0, 0.0, 0.0);
                 glTranslatef(o->coordX, o->coordY + 0.85, o->coordZ);
-                glutWireSphere(0.09, 20, 20);
+                glutWireCube(0.1);
             glPopMatrix();
-            */
 
-            // Calcula a distancia entre os centros
-            double distancia2 = sqrt(
-                pow((o->coordX - (0.05*kirbyX)), 2) +
-                pow((o->coordY+0.85 - (0.05*(kirbyY+1.7))), 2) +
-                pow((o->coordZ - (0.05*kirbyZ)), 2)
-            );
 
-            // Soma dos raios
-            double somaRaios = (0.05*1.3) + 0.09;
-            if (distancia2 <= somaRaios)
+            /* Verifica colisao Esfera-AABB
+             * (contato direto do Kirby com algum objeto)
+             */
+            if (player.getAnimacao() != 4)
             {
-                //printf("aaaaaaaa\tdist = %.2lf somaRaios = %.2lf\n", distancia2, somaRaios);
-                printf("Colisao!!!!!!!!!!!\n");
-                
-                Objeto o2;
-                o2.desenhar = true; o2.usarTextura = o->usarTextura;
-                o2.coordX = o->coordX+1.0; o2.coordY = o->coordY; o2.coordZ = o->coordZ;
-                o2.corR = o->corR; o2.corG = o->corG; o2.corB = o->corB;
-                o2.texX1 = o->texX1; o2.texX2 = o->texX2; o2.texY1 = o->texY1; o2.texY2 = o->texY2;
-                objetos.push_front(o2);
+                // Identifica os valores relacionados a hitbox do Kirby (Esfera)
+                double raioKirby = 0.05*1.3;
+                double hitboxKirby[3] =
+                {
+                    0.05*kirbyX        ,
+                    0.05*(kirbyY + 1.7),
+                    0.05*kirbyZ
+                };
 
-                seletor.houveColisao(regiaoCarregada, objetoCarregado);
+                // Identifica os valores relacionados a hitbox do objeto (AABB)
+                double tamanhoHitboxObjeto = 0.1;
+                double hitboxObjetoAABB[3] =
+                {
+                    o->coordX, 
+                    o->coordY + 0.85, 
+                    o->coordZ
+                };
+
+                // Calcula a distancia entre as hitbox
+                double distancia = sqrt(
+                    pow(abs(hitboxKirby[0] - hitboxObjetoAABB[0]), 2) +
+                    pow(abs(hitboxKirby[1] - hitboxObjetoAABB[1]), 2) +
+                    pow(abs(hitboxKirby[2] - hitboxObjetoAABB[2]), 2)
+                );
+
+                // Calcula a soma dos raios
+                double somaRaios = raioKirby + tamanhoHitboxObjeto;
+
+                // Verifica se houve colisao
+                if (distancia <= somaRaios)
+                {
+                    if (o->tipo == 'c')
+                    {
+                        // Se o objeto for um coletavel, o remove da cena
+                        seletor.houveColisao(regiaoCarregada, objetoCarregado, 0);
+                        player.incrementaScore();
+                    }
+                    else
+                    {
+                        // Se o objeto for um inimigo, Kirby recebe dano e sofre repulsao (knockback)
+                        player.moveKirby(-1.05,  0.00,  0.00);
+                        player.perdeVida();
+                    }
+                }
+            }
+
+            /* Verifica colisao AABB-AABB
+             * (Kirby potencialmente absorvendo um inimigo)
+             */
+            else
+            {
+                if (o->tipo == 'i')
+                {
+                    // Identifica os valores relacionados a hitbox do Kirby aspirando ar
+                    // (AABB)
+                    double tamanhoHitboxAr = 2.5;
+                    double hitboxArAspirado[3];
+                    switch (player.getDirecao())
+                    {
+                        case 0: // Olhando pra FRENTE
+                            {
+                                hitboxArAspirado[0] = 0.05*kirbyX;
+                                hitboxArAspirado[1] = 0.05*(kirbyY + 1.7);
+                                hitboxArAspirado[2] = 0.05*(kirbyZ - 3.0);
+                            }
+                        break;
+                        case 1: // Olhando pra ESQUERDA
+                            {
+                                hitboxArAspirado[0] = 0.05*(kirbyX - 2.5);
+                                hitboxArAspirado[1] = 0.05*(kirbyY + 1.7);
+                                hitboxArAspirado[2] = 0.05*kirbyZ;
+                            }
+                        break;
+                        case 2: // Olhando pra TRAS
+                            {
+                                hitboxArAspirado[0] = 0.05*kirbyX;
+                                hitboxArAspirado[1] = 0.05*(kirbyY + 1.7);
+                                hitboxArAspirado[2] = 0.05*(kirbyZ + 3.0);
+                            }
+                        break;
+                        case 3: // Olhando pra DIREITA
+                            {
+                                hitboxArAspirado[0] = 0.05*(kirbyX + 2.5);
+                                hitboxArAspirado[1] = 0.05*(kirbyY + 1.7);
+                                hitboxArAspirado[2] = 0.05*kirbyZ;
+                            }
+                        break;
+                    }
+
+                    // Identifica os valores relacionados a hitbox do objeto (AABB)
+                    double tamanhoHitboxObjeto = 0.1;
+                    double hitboxObjetoAABB[3] =
+                    {
+                        o->coordX,
+                        o->coordY + 0.85, 
+                        o->coordZ
+                    };
+
+                
+                    // Calcula a distancia entre as hitboxes
+                    double distancia = sqrt(
+                        pow(abs(hitboxObjetoAABB[0] - hitboxArAspirado[0]), 2) +
+                        pow(abs(hitboxObjetoAABB[1] - hitboxArAspirado[1]), 2) +
+                        pow(abs(hitboxObjetoAABB[2] - hitboxArAspirado[2]), 2)
+                    );
+
+
+                    // Com base na distancia entre Kirby e o inimigo
+                    if (distancia < 0.12)
+                    {
+                        // Simula uma animacao de "absorcao" do inimigo
+                        if (distancia > 0.08)
+                        {
+                            seletor.houveColisao(regiaoCarregada, objetoCarregado, 1);
+                        }
+
+                        // Absorve o inimigo
+                        else
+                        {
+                            seletor.houveColisao(regiaoCarregada, objetoCarregado, 0);
+                            player.incrementaScore();
+                            //Objeto absorvido = *o;
+                            player.absorverObjeto(*o);
+                        }
+                    }
+                }
             }
 
             objetoCarregado++;
