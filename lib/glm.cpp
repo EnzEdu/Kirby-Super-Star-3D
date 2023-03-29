@@ -13,6 +13,9 @@
       - Emissive marerial
       - Loading material textures from PPM format image files
       - Animation with Wavefront OBJ models
+
+      Updated by Enzo Eduardo, 2023
+      - Following filename_00000X frame number convention of Blender
  */
 
 

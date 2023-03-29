@@ -1,4 +1,4 @@
-/*  GIMP header image file format (RGB): /home/enzo/Desktop/CG/CG.aGame_EnzoEduardo/img/texturaHud.h */
+/*  GIMP header image file format (RGB): /home/enzo/Desktop/CG/CG.aGame_EnzoEduardo/img/texturaHUD.h */
 
 static unsigned int hudWidth = 16;
 static unsigned int hudHeight = 16;

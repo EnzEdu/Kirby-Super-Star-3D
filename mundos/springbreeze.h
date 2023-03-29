@@ -1,3 +1,11 @@
+/*
+ * Atividade Game - Computacao Grafica
+ * Codigo OpenGL/GLUT responsavel pelo primeiro mundo do jogo, Spring Breeze
+ * Autor: Enzo Eduardo Cassiano Ibiapina
+ * Data: 29/03/2023
+*/
+
+
 #ifndef SPRINGBREEZE_H
 #define SPRINGBREEZE_H
 
@@ -9,33 +17,49 @@ class SpringBreeze : public Mundo
 							 SpringBreeze 		();
 		void 				 desenhar			();
 		forward_list<Objeto> getListaObjetos	(int idRegiao);
+		forward_list<Objeto> getListaHitboxes	(int idRegiao);
+		int 				 getScoreMaximo		();
 
 	private:
 		int numRegioes;
+		int scoreMaximo = 18000;
 };
 
-// Inicializador?
+
 SpringBreeze::SpringBreeze() {
 
-
 	// Instancia as regioes do mundo
-			pushRegiao(0.0, 0.0,   0.0, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.505, 1.000);
-			pushRegiao(0.0, 0.0,  -1.5, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.505, 1.000);
-			pushObjeto('i', false,  0.5, 0.0, -1.5, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
-			pushObjeto('c', false, -0.5, 0.0, -1.5, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
-			pushRegiao(0.0, 0.0,  -3.0, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.505, 1.000);
-			pushRegiao(0.0, 0.0,  -4.5, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.505, 1.000);
-			pushRegiao(0.0, 0.0,  -6.0, 0.000, 0.333, 0.000, 0.333, 0.000, 0.333, 0.505, 1.000);
-			pushRegiao(0.0, 0.0,  -7.5, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.505, 1.000);
-			pushRegiao(0.0, 0.0,  -9.0, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.505, 1.000);
-			pushRegiao(0.0, 0.0, -10.5, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.505, 1.000);
-			pushRegiao(0.0, 0.0, -12.0, 0.333, 0.666, 0.000, 0.333, 0.333, 0.666, 0.505, 1.000);
-			pushRegiao(0.0, 0.0, -13.5, 0.666, 1.000, 0.000, 0.333, 0.000, 0.333, 0.505, 1.000);
+	pushRegiao(0.0, 0.0,   0.0, 0.000, 0.333, 0.000, 0.500, 0.000, 0.333, 0.500, 1.000);
+	pushObjeto('c', 0.3, 0.0, -1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushRegiao(0.0, 0.0,  -1.5, 0.000, 0.333, 0.000, 0.500, 0.000, 0.333, 0.500, 1.000);
+	pushObjeto('c', -0.5, 0.0, -1.5, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushObjeto('c',  0.5, 0.2, -2.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushObjeto('c', -0.5, 0.0, -2.5, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushRegiao(0.0, 0.0,  -3.0, 0.000, 0.333, 0.000, 0.500, 0.000, 0.333, 0.500, 1.000);
+	pushObjeto('c', -0.4, 0.0, -3.4, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushObjeto('c', -0.1, 0.0, -3.9, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushObjeto('c',  0.5, 0.1, -4.2, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushRegiao(0.0, 0.0,  -4.5, 0.000, 0.333, 0.000, 0.500, 0.000, 0.333, 0.500, 1.000);
+	pushObjeto('c', 0.3, 0.0, -5.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushRegiao(0.0, 0.0,  -6.0, 0.000, 0.333, 0.000, 0.500, 0.000, 0.333, 0.500, 1.000);
 
+	pushRegiao(0.0, 0.0,  -7.5, 0.333, 0.666, 0.000, 0.500, 0.334, 0.666, 0.500, 1.000);
+	pushObjeto('i',  0.5, 0.0, -7.5, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0);
+	pushObjeto('i', -0.5, 0.0, -7.5, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0);
+	pushObjeto('i',  0.3, 0.0, -8.6, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0);
+	pushRegiao(0.0, 0.0,  -9.0, 0.333, 0.666, 0.000, 0.500, 0.334, 0.666, 0.500, 1.000);
+	pushObjeto('i', -0.2, 0.0, -9.3, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0);
+	pushObjeto('i',  0.4, 0.0, -9.8, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0);
+	pushRegiao(0.0, 0.0, -10.5, 0.333, 0.666, 0.000, 0.500, 0.334, 0.666, 0.500, 1.000);
+	pushRegiao(0.0, 0.0, -12.0, 0.333, 0.666, 0.000, 0.500, 0.334, 0.666, 0.500, 1.000);
+	pushObjeto('i', 0.0, 0.0, -12.5, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0);
+	
+	pushRegiao(0.0, 0.0, -13.5, 0.666, 1.000, 0.000, 0.500, 0.334, 0.666, 0.500, 1.000);
+	pushObjeto('c',  0.0, 0.2, -13.5, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	pushRegiao(1.5, 0.0, -15.0, 0.666, 1.000, 0.000, 0.500, 0.334, 0.666, 0.500, 1.000);
 
-	//regioes.push();
-
-			numRegioes = distance(regioes.begin(), regioes.end());
+	// Contabiliza o numero de regioes
+	numRegioes = distance(regioes.begin(), regioes.end());
 
 	regioes.reverse();
 }
@@ -213,21 +237,19 @@ void SpringBreeze::desenhar()
 
 
 			// Desenha os objetos da regiao
+			int idObjeto = 0;
 			for (forward_list<Objeto>::iterator o = r->objetos.begin(); o != r->objetos.end(); o++)
 			{
-				//if (o->desenhar == true)
-				//{
-					if (o->usarTextura == false)
-					{
-						glBindTexture(GL_TEXTURE_2D, 0);
+				// Desativa a textura
+				glBindTexture(GL_TEXTURE_2D, 0);
 
-						glPushMatrix();
-							glColor3f(o->corR, o->corG, o->corB);
-							glTranslatef(o->coordX, 0.85 + o->coordY, o->coordZ);
-							glutSolidCube(0.1);
-						glPopMatrix();
-					}
-				//}
+				glPushMatrix();
+					glColor3f(o->corR, o->corG, o->corB);
+					glTranslatef(o->coordX, 0.85 + o->coordY, o->coordZ);
+					glutSolidCube(0.1);
+				glPopMatrix();
+
+				idObjeto++;
 			}
 		}
 
@@ -238,70 +260,13 @@ void SpringBreeze::desenhar()
 
 		regiaoAtual++;
 	}
-
-
-	/*
-	for (int i = 0; i < numRegioes; i++)
-	{
-		// Chao
-		glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);
-		glPushMatrix();
-			glColor3f(0.0, 0.0, 0.0);
-			glTranslatef(0.0, 0.0, -(1.5)*i);
-			glBegin(GL_QUADS);
-				for (int i = 0; i < numFacesCubo; i++)
-				{
-					for (int j = 0; j < 4; j++)
-					{
-						// Define o vertice j da face i
-						glTexCoord2fv(coordsTexturaChaoUm[i][j]);
-						glVertex3fv(coordsVertices[coordsFaces[i][j]]);
-					}
-				}
-			glEnd();
-		glPopMatrix();
-
-		
-		// Parede esquerda
-		glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);
-		glPushMatrix();
-			glColor3f(0.0, 0.0, 0.0);
-			glTranslatef(-1.5, 1.5, -(1.5)*i - (0.001*i));
-			glBegin(GL_QUADS);
-				for (int i = 0; i < numFacesCubo; i++)
-				{
-					for (int j = 0; j < 4; j++)
-					{
-						// Define o vertice j da face i
-						glTexCoord2fv(coordsTexturaPaisagemUm[i][j]);
-						glVertex3fv(coordsVertices[coordsFaces[i][j]]);
-					}
-				}
-			glEnd();
-		glPopMatrix();
-
-		
-		// Parede direita
-		glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);
-		glPushMatrix();
-			glColor3f(0.0, 0.0, 0.0);
-			glTranslatef(1.5, 1.5, -(1.5)*i - (0.001*i));
-			glBegin(GL_QUADS);
-				for (int i = 0; i < numFacesCubo; i++)
-				{
-					for (int j = 0; j < 4; j++)
-					{
-						// Define o vertice j da face i
-						glTexCoord2fv(coordsTexturaPaisagemUm[i][j]);
-						glVertex3fv(coordsVertices[coordsFaces[i][j]]);
-					}
-				}
-			glEnd();
-		glPopMatrix();
-	}
-	*/
 }
 
+
+
+/*
+ *	Funcao que retorna a lista de objetos de uma regiao
+ */
 forward_list<Objeto> SpringBreeze::getListaObjetos(int idRegiao)
 {
 	int regiaoAtual = 0;
@@ -318,5 +283,39 @@ forward_list<Objeto> SpringBreeze::getListaObjetos(int idRegiao)
 	forward_list<Objeto> nada;
 	return nada;
 }
+
+
+
+/*
+ *	Funcao que retorna a lista de hitboxes de uma regiao
+ */
+forward_list<Objeto> SpringBreeze::getListaHitboxes(int idRegiao)
+{
+	int regiaoAtual = 0;
+	for (forward_list<Regiao>::iterator r = regioes.begin(); r != regioes.end(); r++)
+	{
+		if (idRegiao == regiaoAtual)
+		{
+			return r->hitboxes;
+		}
+
+		regiaoAtual++;
+	}
+
+	forward_list<Objeto> nada;
+	return nada;
+}
+
+
+
+/*
+ *	Funcao que retorna o score maximo alcancavel na fase
+ */
+int SpringBreeze::getScoreMaximo()
+{
+	return scoreMaximo;
+}
+
+
 
 #endif

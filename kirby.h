@@ -1,21 +1,30 @@
-// Kirby by Miaru3d is licensed under Creative Commons Attribution
+/*
+ * Atividade Game - Computacao Grafica
+ * Codigo OpenGL/GLUT responsavel pelo controle do desenho do jogador, Kirby
+ * Autor: Enzo Eduardo Cassiano Ibiapina
+ * Modelo: Kirby by Miaru3d - licensed under Creative Commons Attribution
+ * Data: 29/03/2023
+*/
+
 
 #ifndef KIRBY_H
 #define KIRBY_H
 
-//#include "lib/glm.cpp"
 #include <map>
 
 class Kirby
 {
 	private:
+		// Estados de animacao e direcao
 		enum animacoes_ids {PAUSADO, IDLE, ANDANDO, PULANDO, ASPIRANDO, CHEIO};
 		enum direcoes_ids {FRENTE, ESQUERDA, COSTAS, DIREITA};
 
-		int keyframe 				= 0;
-		//GLuint mode 				= GLM_SMOOTH;		// Modo de sombreamento
-		int count_rate = -1; //Conta a quantidade de repeticoes do keyframe ate atingir a taxa keyframe_rate
-		int frames_playing = 0; //Conta a quantidade de quadros enquanto reproduz uma mesma animacao ate troca-la
+		GLManimation *animation = NULL; 		// Ponteiro usado no armazenamento de uma animacao
+		map <int, GLManimation *> animations; 	// Mapeamento dos identificadores com as animacoes
+
+		int keyframe       = 0;
+		int count_rate     = -1; // Conta a quantidade de repeticoes do keyframe ate atingir keyframe_rate
+		int frames_playing = 0;  // Conta a quantidade de quadros da animacao
 
 		double raio = 0.0625;
 		double posX =  0.00, rotX = 0;
@@ -24,30 +33,29 @@ class Kirby
 
 		int vidas = 3;
 		int score = 0;
-		Objeto boca;
 
 	public:
 		bool pulando = false;
 		bool estaCheio = false;
-		int olhando = FRENTE;
+		int direcao = FRENTE;
 		int animacao_id = IDLE;
 		int animacao_atual = IDLE;
 		int contadorParado = 0;
 		int contadorInvulneravel = 0;
 
-
 		void	carregaModelo		();
+		void	desenhar			();
 		void	atualizaKeyframe	();
 		void	playAnimation 		(int id);
 		void	keyPlayAnimation	(int id);
 
-		void	desenhar			();
 		void	moveKirby			(double valorX, double valorY, double valorZ);
-		void 	incrementaScore		();
-		void	absorverObjeto		(Objeto obj);
-		void 	soltarObjeto		();
+		void	absorverObjeto		();
 		void	perdeVida			();
-		void 	reset				();
+		void 	morte				();
+		void 	incrementaScore		();
+		void	resetScore			();
+
 		double	getCoordenadaX		();
 		double	getCoordenadaY		();
 		double	getCoordenadaZ		();
@@ -56,9 +64,6 @@ class Kirby
 		int 	getVidas			();
 		int 	getScore			();
 };
-
-GLManimation *animation = NULL;   // Ponteiro usado no armazenamento de uma animacao
-map <int, GLManimation *> animations; // Mapeamento dos identificadores com as animacoes
 
 
 // Carrega o modelo 3D do Kirby
@@ -93,7 +98,6 @@ void Kirby::carregaModelo()
 // Desenha o Kirby
 void Kirby::desenhar()
 {
-	// Situacao usual
 	if (contadorInvulneravel == 0)
 	{
 		// Define o modo de textura
@@ -153,24 +157,24 @@ void Kirby::desenhar()
 	    	glPushMatrix();
     			glColor3f(1.0, 1.0, 1.0);
     			glScaled(0.05, 0.05, 0.05);
-    			switch (olhando)
+    			switch (direcao)
 	    		{
 		    		case FRENTE:	glTranslated(posX, posY+1.7, posZ-3.0);		break;
 			    	case COSTAS:	glTranslated(posX, posY+1.7, posZ+3.0);		break;
 			    	case ESQUERDA:	glTranslated(posX-2.5, posY+1.7, posZ);		break;
 			    	case DIREITA:	glTranslated(posX+2.5, posY+1.7, posZ);		break;
     			}
-    		    glutWireCube(2.5);
+    			glutWireSphere(2.5, 20, 20);
 		    glPopMatrix();
 	    }
     }
 
-//	printf("POSICAO KIRBY = %.2f %.2f %.2f\n", posX, posY, posZ);
     
     // Atualizacao de estados do modelo do personagem
     atualizaKeyframe();
 
-	// Caso esteja inflado, realiza uma queda livre ate a altura original
+
+	// Queda livre do Kirby caso tenha pulado
 	if (pause == false && (int) (posY * 100) > 1500)
 	{
 		posY -= 0.02;
@@ -179,7 +183,7 @@ void Kirby::desenhar()
 		glutPostRedisplay();
 	}
 
-	//
+	// Decrementa o tempo de invulnerabilidade
 	if (contadorInvulneravel != 0)
 	{
 		contadorInvulneravel--;
@@ -202,8 +206,8 @@ void Kirby::atualizaKeyframe()
     	// Ao atingir a taxa de keyframes
         if (count_rate == KEYFRAME_RATE)
         {
-            keyframe++; 	// incrementa o keyframe atual
-            count_rate = 0; // reinicia o contador da taxa de keyframes
+            keyframe++; 	// Incrementa o keyframe atual
+            count_rate = 0; // Reinicia o contador da taxa de keyframes
         }
         
         // Quantidade de frames da animacao atual
@@ -250,11 +254,16 @@ void Kirby::atualizaKeyframe()
  */
 void Kirby::playAnimation(int id)
 {
+	// Reseta as variaveis de animacao
     keyframe = 0; // Atribui o modelo 3D zero da animacao selecionada para ser desenhado
     frames_playing = 1; // Reinicia a contagem de frames da reproducao da mesma animacao
     count_rate = 0; // Reinicia o contador de repeticoes do mesmo keyframe
-    animacao_id = id; // Ativa a animacao com o identificador id
-    animacao_atual = animacao_id; // Salva qual e a animacao atual
+
+    // Redefine a animacao atual
+    animacao_id = id;
+    animacao_atual = animacao_id;
+
+    // Reinicia o contador parado
     contadorParado = animations[animacao_atual]->keyframes;
 
     // Verifica se Kirby comecou a pular
@@ -299,29 +308,36 @@ void Kirby::moveKirby(double valorX, double valorY, double valorZ)
 		posX += valorX;
 	}
 
-	posY += valorY;
-	posZ += valorZ;
+	if (posY + valorY < 23.00)
+	{
+		posY += valorY;
+	}
+
+	if (posZ + valorZ > -285.00 && posZ + valorZ < 15.00)
+	{
+		posZ += valorZ;
+	}
 
 
 	// Atualiza a direcao pra onde esta olhando
 	if (valorZ < 0)
 	{
-		olhando = FRENTE;
+		direcao = FRENTE;
 		rotY = 180.0;
 	}
 	else if (valorX < 0)
 	{
-		olhando = ESQUERDA;
+		direcao = ESQUERDA;
 		rotY = -90.0;
 	}
 	else if (valorZ > 0)
 	{
-		olhando = COSTAS;
+		direcao = COSTAS;
 		rotY = 0.0;
 	}
 	else if (valorX > 0)
 	{
-		olhando = DIREITA;
+		direcao = DIREITA;
 		rotY = 90.0;
 	}
 }
@@ -349,37 +365,13 @@ int Kirby::getAnimacao()
 
 int Kirby::getDirecao()
 {
-	return olhando;
+	return direcao;
 }
 
 
-void Kirby::absorverObjeto(Objeto obj)
+void Kirby::absorverObjeto()
 {
 	keyPlayAnimation(CHEIO);
-//	if (obj.tipo ==)
-	printf("%.2lf\n", obj.coordX);
-}
-
-
-void Kirby::soltarObjeto()
-{
-	/*
-		glPushMatrix();
-			glColor3f(1.0, 0.0, 0.0);
-    		glScaled(0.05, 0.05, 0.05);
-    		switch (olhando)
-    		{
-		    	case FRENTE:	glTranslated(posX, posY+1.7, posZ-3.0);		break;
-		    	case COSTAS:	glTranslated(posX, posY+1.7, posZ+3.0);		break;
-		    	case ESQUERDA:	glTranslated(posX-2.5, posY+1.7, posZ);		break;
-		    	case DIREITA:	glTranslated(posX+2.5, posY+1.7, posZ);		break;
-    		}
-    	    //glutWireCube(2.5);
-			glutSolidCube(0.1);
-		glPopMatrix();
-		*/
-	//estaCheio = false;
-
 }
 
 
@@ -395,6 +387,14 @@ int Kirby::getScore()
 }
 
 
+
+void Kirby::resetScore()
+{
+	score = 0;
+}
+
+
+
 void Kirby::perdeVida()
 {
 	if (contadorInvulneravel == 0)
@@ -404,28 +404,37 @@ void Kirby::perdeVida()
 
 		if (vidas == 0)
 		{
-			reset();
+			morte();
 		}
 	}
 }
+
+
 
 int Kirby::getVidas()
 {
 	return vidas;
 }
 
-void Kirby::reset()
+
+
+/*
+ *	Funcao que redefine valores das variaveis caso Kirby perca suas vidas
+ */
+void Kirby::morte()
 {
 	posX =  0.00;
 	posY = 15.00;
 	posZ = 10.00;
 	rotY = 180;
-	olhando = FRENTE;
+	direcao = FRENTE;
 	vidas = 3;
 
 	camX = 0.0;
 	camY = 0.0;
 	camZ = 1.5;
 }
+
+
 
 #endif

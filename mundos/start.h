@@ -1,3 +1,11 @@
+/*
+ * Atividade Game - Computacao Grafica
+ * Codigo OpenGL/GLUT responsavel pela tela inicial do game
+ * Autor: Enzo Eduardo Cassiano Ibiapina
+ * Data: 29/03/2023
+*/
+
+
 #ifndef START_H
 #define START_H
 
@@ -7,30 +15,14 @@
 class Start : public Mundo
 {
 	public:
-		Start 						();
 		void desenhar				();
 
 	private:
 		int numRegioes;
 };
 
-// Inicializador?
-Start::Start() {
-	//
-}
-
 void Start::desenhar()
 {
-	/*
-	glColor3f(0.0, 1.0, 0.0);
-	glBegin(GL_QUADS);
-		glVertex2f(0, 0);
-		glVertex2f(width, 0);
-		glVertex2f(width, height);
-		glVertex2f(0, height);
-	glEnd();
-	*/
-
 	// Define as coordenadas da tela de start
 	// 4 = num de vertices, 2 = coordenadas xy
 	GLfloat coordsVerticesHUD[4][2] = {
@@ -53,13 +45,14 @@ void Start::desenhar()
 	};
 
 
+
 	// Define o modo de textura
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
 	// Seleciona o mapeamento de textura do mapa
 	glBindTexture(GL_TEXTURE_2D, objetosMapa[0]);	
 	
-	// Desenha o HUD
+	// Desenha a tela
 	glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_QUADS);
         for (int i=0; i<1; i++){

@@ -1,3 +1,11 @@
+/*
+ * Atividade Game - Computacao Grafica
+ * Codigo OpenGL/GLUT responsavel pelo desenho do HUD do game
+ * Autor: Enzo Eduardo Cassiano Ibiapina
+ * Data: 29/03/2023
+*/
+
+
 #ifndef HUD_H
 #define HUD_H
 
@@ -6,14 +14,8 @@
 class HUD
 {
 	public:
-				HUD 				();
 		void	desenhaHUD			();
 };
-
-HUD::HUD()
-{
-	//
-}
 
 /*
  *	Funcao que desenha o HUD
@@ -59,7 +61,7 @@ void HUD::desenhaHUD()
 	// Define o modo de textura
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-	// Seleciona o mapeamento de textura do mapa
+	// Seleciona o mapeamento de textura do HUD
 	glBindTexture(GL_TEXTURE_2D, objetosMapa[1]);	
 	
 	// Desenha o HUD

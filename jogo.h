@@ -1,3 +1,11 @@
+/*
+ * Atividade Game - Computacao Grafica
+ * Codigo OpenGL/GLUT responsavel pela definicao de certas variaveis globais
+ * Autor: Enzo Eduardo Cassiano Ibiapina
+ * Data: 29/03/2023
+*/
+
+
 #ifndef JOGO_H
 #define JOGO_H
 
@@ -8,35 +16,34 @@
 
 
 // Variaveis relacionadas com o FPS do jogo
-#define MAX_FPS 60	// Numero maximo de FPS do jogo
-#define FPS 60 // FPS desejado atualmente
+#define FPS 60 // FPS desejado
 int fps_desejado = FPS/2; // Variavel para alterar os frames por segundo
-int fps = 0; //contador de frames por segundo
-
-
-// Variavel que define a camera selecionada
-int tipoCamera = 0;
 
 
 // Keyframes
 #define KEYFRAME_RATE 3 // taxa de repeticoes do keyframe da animacao nos quadros da video
 
 
-// Vetor de conteudos carregados por fase (texturas, objetos)
+// Variaveis de camera
+int tipoCamera = 0;
+double camX = 0.0, camY = 0.00, camZ = 1.5;
+
+
+// Variaveis que guardam a dimensao da janela
+int width = 800, height = 600;
+
+
+// Vetor de conteudos carregados por fase (texturas e regioes)
 unsigned int objetosMapa[10] = 
 {
-	65535, 65535, 65535, 65535, 65535, 
-	65535, 65535, 65535, 65535, 65535
+	65535, 65535, 65535, 65535, 65535, 	// Dedicados a texturas
+	65535, 65535, 65535, 65535, 65535	// Dedicados a regioes
 };
 
 
 // Variaveis de escolha
 bool pause = false;
 bool hitbox = false;
-
-
-// Variavel que representa o teclado
-bool teclado[255];
 
 
 #endif
